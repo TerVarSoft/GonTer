@@ -1,4 +1,5 @@
-This project is a mobile version for the tunari services
+This project is a mobile version used for the admins
+to manage tunari services
 
 ## To install
 
