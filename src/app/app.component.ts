@@ -5,6 +5,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { Network } from "@ionic-native/network";
 
 import { ProductsPage } from '../pages/products/products';
+import { LoginPage } from '../pages/login/login';
 
 import { Connection } from '../providers/connection';
 import { Login } from '../providers/login';
@@ -20,7 +21,7 @@ import { UserToken } from '../models/user-token';
 })
 export class GrafTunariApp {
   
-  rootPage:any = ProductsPage;
+  rootPage:any = LoginPage;
 
   private userToken: UserToken;
 
@@ -58,35 +59,21 @@ export class GrafTunariApp {
         this.notifier.createToast(this.messages.noInternetError);
       }
     });
-        
-    this.initialSetup();
+
+    this.setRootPage();    
   }
 
-  private initialSetup() {
-        
-    this.initialLogin();         
-  }
-
-  private initialLogin() {            
+  private setRootPage() {
     this.storage.getAuthtoken().then(token => {
-      if(!token) {        
-        let loader = this.notifier.createLoader(this.messages.authenticating);
-        this.login.post().subscribe(resp => {
-          this.userToken = resp;
-          this.storage.setAuthToken(this.userToken.token);                                      
-          
-          console.log("Token Authentication: " + this.userToken.token);
-          loader.dismiss();
-          this.loadConfiguration();
-        });
-      }
-      else {
-        console.log("Already Authenticated");        
+      if(token) {  
+        this.rootPage = ProductsPage;
         this.loadConfiguration();
+      } else {
+        this.finishLoading();        
       }
-    });   
+    });
   }
-
+ 
   private loadConfiguration() {    
     
     this.settingsProvider.loadFromStorage().then(settings => {

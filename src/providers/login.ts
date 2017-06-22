@@ -17,9 +17,7 @@ export class Login {
     this.baseUrl = this.api.baseUrl + "/login";
   }
 
-  post() {
-    let userName = "tunariTest";
-    let password = "tunariTest";
+  post(userName: string, password: string) {    
 
     return this.api.post(this.endpoint, { 
       userName: userName,
