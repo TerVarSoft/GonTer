@@ -4,7 +4,6 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Network } from "@ionic-native/network";
 
-import { ProductsPage } from '../pages/products/products';
 import { LoginPage } from '../pages/login/login';
 
 import { Connection } from '../providers/connection';
@@ -14,18 +13,12 @@ import { TunariMessages } from '../providers/tunari-messages';
 import { TunariNotifier } from '../providers/tunari-notifier';
 import { TunariStorage } from '../providers/tunari-storage';
 
-import { UserToken } from '../models/user-token';
-
 @Component({
   templateUrl: 'app.html',
 })
 export class GrafTunariApp {
   
   rootPage:any = LoginPage;
-
-  private userToken: UserToken;
-
-  private isReady: boolean = false;
 
   constructor(
     public platform: Platform, 
@@ -59,41 +52,6 @@ export class GrafTunariApp {
         this.notifier.createToast(this.messages.noInternetError);
       }
     });
-
-    this.setRootPage();    
-  }
-
-  private setRootPage() {
-    this.storage.getAuthtoken().then(token => {
-      if(token) {  
-        this.rootPage = ProductsPage;
-        this.loadConfiguration();
-      } else {
-        this.finishLoading();        
-      }
-    });
-  }
- 
-  private loadConfiguration() {    
-    
-    this.settingsProvider.loadFromStorage().then(settings => {
-      if(settings) {
-        console.log("Settings loaded from local storage...");
-        this.finishLoading();
-        this.settingsProvider.loadFromServer().subscribe();
-      } else {
-        let loader = this.notifier.createLoader(this.messages.loadingSettings);
-        this.settingsProvider.loadFromServer().subscribe(() => {
-          console.log("Settings loaded from the server...");
-          this.finishLoading();
-          loader.dismiss();          
-        });
-      }                  
-    });    
-  }  
-
-  private finishLoading() {
-    this.isReady = true;           
   }
 }
 
