@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { LoadingController, AlertController, Platform } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { Platform, NavController } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Network } from "@ionic-native/network";
@@ -7,8 +7,6 @@ import { Network } from "@ionic-native/network";
 import { LoginPage } from '../pages/login/login';
 
 import { Connection } from '../providers/connection';
-import { Login } from '../providers/login';
-import { SettingsCache } from '../providers/settings-cache';
 import { TunariMessages } from '../providers/tunari-messages';
 import { TunariNotifier } from '../providers/tunari-notifier';
 import { TunariStorage } from '../providers/tunari-storage';
@@ -18,6 +16,8 @@ import { TunariStorage } from '../providers/tunari-storage';
 })
 export class GrafTunariApp {
   
+  @ViewChild('rootNavController') navCtrl: NavController;
+
   rootPage:any = LoginPage;
 
   constructor(
@@ -25,13 +25,9 @@ export class GrafTunariApp {
     statusBar: StatusBar,
     public network: Network, 
     splashScreen: SplashScreen,    
-    public alertCtrl: AlertController,
-    public loadingCtrl: LoadingController,    
     public storage: TunariStorage,
     public messages: TunariMessages,
     public notifier: TunariNotifier,
-    public settingsProvider: SettingsCache,
-    public login: Login,
     public connection: Connection
   ) {
     platform.ready().then(() => {
@@ -52,6 +48,11 @@ export class GrafTunariApp {
         this.notifier.createToast(this.messages.noInternetError);
       }
     });
+  }
+
+  onLogout() {
+    this.storage.removeStorage();
+    this.navCtrl.setRoot(LoginPage);
   }
 }
 

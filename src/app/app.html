@@ -1,1 +1,24 @@
-<ion-nav [root]="rootPage"></ion-nav>
+<ion-split-pane>
+  <ion-menu [content]="rootNavController">
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Menu</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="outer-content">
+      <ion-list>
+        <ion-list-header>
+          Usuario
+        </ion-list-header>
+        <button ion-item menuClose (click)="onLogout()">
+          <ion-icon item-start name="log-out"></ion-icon>
+          Salir
+        </button>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+  
+  <ion-nav #rootNavController [root]="rootPage" main></ion-nav>
+</ion-split-pane>
+

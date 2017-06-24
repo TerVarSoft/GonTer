@@ -42,6 +42,10 @@ export class TunariStorage {
   public setProductFavorites(value: any) {    
     this.setValue(this.productFavoritesKey, JSON.stringify(value));
   }
+  
+  public removeStorage() {
+    this.storage.clear();
+  }
 
   private getValue(key: string) {
     return this.storage.get(key);
