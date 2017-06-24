@@ -62,7 +62,7 @@ export class TunariApi {
       return this.http.get(productUrl, requestOptions)
         .map(res => res.blob())
         .map(blob => URL.createObjectURL(blob))
-        .map(url => this.sanitizer.bypassSecurityTrustResourceUrl(url));
+        //.map(url => this.sanitizer.bypassSecurityTrustResourceUrl(url));
     });      
   }
 

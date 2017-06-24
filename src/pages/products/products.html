@@ -9,19 +9,21 @@
   </ion-navbar>  
 
   <ion-toolbar color="primary">
-    <ion-searchbar placeholder="Busca un producto en GrafTunari !" [formControl]="searchQuery">
+    <ion-searchbar #searchInput
+      placeholder="Busca un producto en GrafTunari !" 
+      [formControl]="searchQuery" (ionClear)="onSearchClear()">
     </ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content padding>
   <ion-list>
-    <ion-item *ngFor="let product of products">
+    <ion-item *ngFor="let product of products" (click)="goToProductDetails(product)">
       <ion-thumbnail item-left>
         <product-img [product]="product"></product-img>
       </ion-thumbnail>
-      <h2>{{product.name}}</h2>
-      <h3>{{product.properties.type}}</h3>
+      <h2 class="text-color">{{product.name}}</h2>
+      <h3 class="text-color">{{product.properties.type}}</h3>
       <p *ngIf="product.publicPackagePrice.value">
         {{product.publicPackagePrice.type}}: {{product.publicPackagePrice.value}} Bs.
       </p>

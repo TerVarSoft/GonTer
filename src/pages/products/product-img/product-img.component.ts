@@ -1,34 +1,35 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 import { TunariApi } from '../../../providers/tunari-api';
-import { ProductImgUtil } from './product-img-util/product-img-util';
+import { ProductImgUtil } from './product-img-util';
 
 import { Product } from '../../../models/product';
 
 @Component({
   selector: 'product-img',
-  templateUrl: 'product-img.html',
+  templateUrl: 'product-img.component.html',
   providers: [ProductImgUtil]
 })
-export class ProductImg implements OnInit {
+export class ProductImgComponent implements OnInit {
 
   @Input() product: Product;
-  
-  private productImgUrl: any;
 
   constructor(public api: TunariApi, public util: ProductImgUtil) {}
 
-  ngOnInit() {    
+  ngOnInit() { 
+    this.product.thumbnailUrl = 'assets/img/loading.gif';
+
     this.api
       .getImage(this.util.buildProductImgUrl(this.product))
-      .subscribe(url => this.productImgUrl = url,
+      .subscribe(url => {
+        this.product.thumbnailUrl = url;
+      },
       error => {
         if(error.status === 0) {
-          this.productImgUrl = 'assets/img/errorLoading.gif';
+          this.product.thumbnailUrl = 'assets/img/errorLoading.gif';
         } else if(error.status === 404) {
-          this.productImgUrl = 'assets/img/defaultProduct.png';
+          this.product.thumbnailUrl = 'assets/img/defaultProduct.png';
         }
       });
-    
-  }  
+  }
 }

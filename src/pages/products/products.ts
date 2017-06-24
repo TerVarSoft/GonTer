@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, Renderer } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { NavController } from 'ionic-angular';
 import 'rxjs/add/observable/from';
 import "rxjs/add/operator/debounceTime";
 import "rxjs/add/operator/distinctUntilChanged"
 import "rxjs/add/operator/switchMap";
+
+import { ProductDetailPage } from './product-detail/product-detail';
 
 import { Connection } from '../../providers/connection';
 import { Products } from '../../providers/products';
@@ -27,8 +29,10 @@ export class ProductsPage {
   
   private page: number = 0;
 
-  constructor(public navCtrl: NavController,     
-    public productsProvider: Products, 
+  constructor(public navCtrl: NavController,
+    public renderer: Renderer,
+    private elRef:ElementRef,
+    public productsProvider: Products,
     public util: ProductsUtil, 
     public notifier: TunariNotifier,
     public messages: TunariMessages,
@@ -55,6 +59,19 @@ export class ProductsPage {
     } else {
       infiniteScroll.complete();
     }    
+  }
+
+  goToProductDetails(product: Product) {
+    this.navCtrl.push(ProductDetailPage, {
+      product: product
+    });
+  }
+
+  onSearchClear(event) {
+    const searchInput = this.elRef.nativeElement.querySelector('.searchbar-input')    
+    this.renderer
+      .invokeElementMethod(searchInput, 'blur');
+  
   }
 
   private initFavorites() {

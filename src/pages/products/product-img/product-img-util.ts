@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { SettingsCache } from '../../../../providers/settings-cache';
+import { SettingsCache } from '../../../providers/settings-cache';
 
-import { Product } from '../../../../models/product';
+import { Product } from '../../../models/product';
 
 /**
  * Utility class for product img component. 

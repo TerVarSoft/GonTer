@@ -14,4 +14,6 @@ export class Product {
   publicPackagePrice: ProductPrice;
   
   publicPrices: ProductPrice[];
+
+  thumbnailUrl: string;
 }
