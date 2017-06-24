@@ -1,6 +1,7 @@
 import { Component, ElementRef, Renderer } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { NavController } from 'ionic-angular';
+import { Keyboard } from '@ionic-native/keyboard';
 import 'rxjs/add/observable/from';
 import "rxjs/add/operator/debounceTime";
 import "rxjs/add/operator/distinctUntilChanged"
@@ -30,6 +31,7 @@ export class ProductsPage {
   private page: number = 0;
 
   constructor(public navCtrl: NavController,
+    public keyboard: Keyboard,
     public renderer: Renderer,
     private elRef:ElementRef,
     public productsProvider: Products,
@@ -37,7 +39,8 @@ export class ProductsPage {
     public notifier: TunariNotifier,
     public messages: TunariMessages,
     public connection: Connection) {
-
+    
+    this.setupKeyboard();
     this.initFavorites();    
     this.initSearchQuery();
   }    
@@ -68,10 +71,19 @@ export class ProductsPage {
   }
 
   onSearchClear(event) {
+    this.blurSearchBar();
+  }
+
+  private setupKeyboard() {
+    this.keyboard.onKeyboardHide().subscribe(() => {
+      this.blurSearchBar();
+    });
+  }
+
+  private blurSearchBar() {
     const searchInput = this.elRef.nativeElement.querySelector('.searchbar-input')    
     this.renderer
       .invokeElementMethod(searchInput, 'blur');
-  
   }
 
   private initFavorites() {

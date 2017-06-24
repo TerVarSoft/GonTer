@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { Keyboard } from '@ionic-native/keyboard';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -25,8 +26,9 @@ import { TunariApi } from '../providers/tunari-api';
 import { TunariStorage } from '../providers/tunari-storage';
 
 export function providers() {
-  return [
+  return [    
     Connection,
+    Keyboard,
     Login,    
     Network,
     Products,    
