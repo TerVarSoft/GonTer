@@ -14,4 +14,8 @@ export class TunariMessages {
 
   noInternetError: string = `No estas conectado a Internet!,
         por favor verifica tu conexion y vuelve a intentarl`;      
+
+  invalidUser: string = `Tus usuario o tu passwords son incorrectos!`;
+
+  notAdminUser: string = `Tu usuario no es administrador!`;
 }
