@@ -9,6 +9,7 @@ import { Network } from "@ionic-native/network";
 
 import { GrafTunariApp } from './app.component';
 import { ProductsPage } from '../pages/products/products';
+import { LoginPage } from '../pages/login/login';
 import { ProductImg } from '../pages/products/product-img/product-img';
 
 import { Connection } from '../providers/connection';
@@ -43,6 +44,7 @@ export function providers() {
   declarations: [
     GrafTunariApp,
     ProductsPage,
+    LoginPage,
     ProductImg
   ],
   imports: [
@@ -54,7 +56,8 @@ export function providers() {
   bootstrap: [IonicApp],
   entryComponents: [
     GrafTunariApp,
-    ProductsPage
+    ProductsPage,
+    LoginPage
   ],
   providers: providers()
 })

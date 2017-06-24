@@ -20,7 +20,7 @@ export class TunariStorage {
   }
 
   public setAuthToken(value: string) {
-    this.setValue(this.authTokenKey, value);
+    return this.setValue(this.authTokenKey, value);
   }
 
   public getSettings() {
@@ -42,12 +42,16 @@ export class TunariStorage {
   public setProductFavorites(value: any) {    
     this.setValue(this.productFavoritesKey, JSON.stringify(value));
   }
+  
+  public removeStorage() {
+    this.storage.clear();
+  }
 
   private getValue(key: string) {
     return this.storage.get(key);
   }
 
   private setValue(key: string, value: string) {
-    this.storage.set(key, value);
+    return this.storage.set(key, value);
   }
 }

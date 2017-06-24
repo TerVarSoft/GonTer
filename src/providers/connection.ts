@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Network } from "@ionic-native/network";
 
-import { TunariApi } from './tunari-api';
-
 declare var navigator: any;
 
 /**
