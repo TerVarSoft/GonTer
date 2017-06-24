@@ -28,7 +28,7 @@ export class LoginPage {
     public storage: TunariStorage,
     public messages: TunariMessages) { 
       this.storage.getAuthtoken().then(token => {
-        if(!token) {            
+        if(!token) {                      
           this.isLoggedIn = false;          
         } else {
           this.loadConfiguration();
@@ -44,11 +44,19 @@ export class LoginPage {
       this.loginService.post(this.login.username, this.login.password)
         .subscribe(resp => {
           const userToken: UserToken = resp;
-          this.storage.setAuthToken(userToken.token).then(() => {
-            console.log("Token Authentication: " + userToken.token);
+          if(userToken.user.role === 'admin') {
+            this.storage.setAuthToken(userToken.token).then(() => {
+              console.log("Token Authentication has been provided by the server");            
+              loader.dismiss(); 
+              this.loadConfiguration(); 
+            });
+          } else {
             loader.dismiss(); 
-            this.loadConfiguration(); 
-          });                                                                    
+            this.notifier.createToast(this.messages.notAdminUser);            
+          }                                                                              
+        }, error => {
+          loader.dismiss(); 
+          this.notifier.createToast(this.messages.invalidUser);
         });
     }    
   }
