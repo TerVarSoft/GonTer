@@ -1,5 +1,3 @@
-import { ProductPrice } from './productPrice';
-
 /**
  * Product model.
  */
@@ -11,9 +9,13 @@ export class Product {
 
   properties: any;  
 
-  publicPackagePrice: ProductPrice;
-  
-  publicPrices: ProductPrice[];
+  publicPackagePrice: number;
+
+  publicUnitPrice: number;
+
+  clientPackagePrice: number;
+
+  clientUnitPrice: number;
 
   thumbnailUrl: string;
 }

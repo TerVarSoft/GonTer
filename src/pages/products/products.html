@@ -18,17 +18,32 @@
 
 <ion-content padding>
   <ion-list>
-    <ion-item *ngFor="let product of products" (click)="goToProductDetails(product)">
-      <ion-thumbnail item-left>
-        <product-img [product]="product"></product-img>
-      </ion-thumbnail>
-      <h2 class="text-color">{{product.name}}</h2>
-      <h3 class="text-color">{{product.properties.type}}</h3>
-      <p *ngIf="product.publicPackagePrice.value">
-        {{product.publicPackagePrice.type}}: {{product.publicPackagePrice.value}} Bs.
-      </p>
-    </ion-item>
+    <ion-item-sliding *ngFor="let product of products" (click)="goToProductDetails(product)">
+      <ion-item>
+        <ion-thumbnail item-left>
+          <product-img [product]="product"></product-img>
+        </ion-thumbnail>
+        <h2 class="text-color">{{product.name}}</h2>
+        <h3 class="text-color">{{product.properties.type}}</h3>
+        <p *ngIf="product[selectedPrice]">
+          {{selectedPriceText}}: {{product[selectedPrice]}} Bs.
+        </p>
+      </ion-item>
+      <ion-item-options side="right">
+        <button ion-button color="primary">
+          <ion-icon name="pricetag"></ion-icon>
+          Precio
+        </button>
+      </ion-item-options>
+    </ion-item-sliding>
   </ion-list>
+
+  <ion-fab bottom right #fab>
+    <button ion-fab color="secondary"><ion-icon name="filing"></ion-icon></button>
+    <ion-fab-list side="top">
+      <button ion-fab color="secondary-200" (click)="selectPriceToShow(fab)"><ion-icon name="pricetags"></ion-icon></button>      
+    </ion-fab-list>
+  </ion-fab>
 
   <ion-infinite-scroll (ionInfinite)="pullNextProductsPage($event)">
    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando mas productos">     

@@ -42,13 +42,19 @@
       <ion-item-divider color="primary-50" class="text-color">
         Precios de Cliente
       </ion-item-divider>      
-      <ion-item *ngFor="let clientPrice of product.clientPrices" class="text-color">
-        {{clientPrice.value}} Bs
+      <ion-item  *ngIf="product.clientUnitPrice" class="text-color">
+        {{product.clientUnitPrice}} Bs
         <ion-note item-end>
-          {{clientPrice.type}} ({{clientPrice.quantity}})
+          Unidad
         </ion-note>
       </ion-item>
-      <h6 *ngIf="product.clientPrices.length <= 0" padding class="text-color-light">
+      <ion-item *ngIf="product.clientPackagePrice" class="text-color">
+        {{product.clientPackagePrice}} Bs
+        <ion-note item-end>
+          Paquete {{product.quantityPerPackage ? (product.quantityPerPackage) : ""}}
+        </ion-note>
+      </ion-item>
+      <h6 *ngIf="!product.clientPackagePrice && !product.clientUnitPrice" padding class="text-color-light">
         <ion-icon name="information-circle"></ion-icon>
         Este producto no tiene precios de cliente
       </h6>
@@ -56,14 +62,20 @@
       <ion-item-divider color="primary-50" class="text-color">
         Precios Publicos
       </ion-item-divider>
-      <ion-item *ngFor="let publicPrice of product.publicPrices" class="text-color">
-        {{publicPrice.value}} Bs
+      <ion-item *ngIf="product.publicUnitPrice" class="text-color">
+        {{product.publicUnitPrice}} Bs
         <ion-note item-end>
-          {{publicPrice.type}} ({{publicPrice.quantity}})
+          Unidad
+        </ion-note>
+      </ion-item>
+      <ion-item *ngIf="product.publicPackagePrice" class="text-color">
+        {{product.publicPackagePrice}} Bs
+        <ion-note item-end>
+          Paquete {{product.quantityPerPackage ? product.quantityPerPackage : ""}}
         </ion-note>
       </ion-item>
 
-      <h6 *ngIf="product.publicPrices.length <= 0" padding class="text-color-light">
+      <h6 *ngIf="!product.publicUnitPrice && !product.publicPackagePrice" padding class="text-color-light">
         <ion-icon name="information-circle"></ion-icon>
         Este producto no tiene precios publicos
       </h6>
