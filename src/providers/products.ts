@@ -23,15 +23,20 @@ export class Products {
     let commonTags = "Invitaciones ";
     params.set('tags', commonTags + query); 
     params.set('page', page.toString()); 
-    let requestOptions = new RequestOptions({search: params});        
+    let requestOptions = new RequestOptions({search: params});
 
     return this.api.get(this.endpoint, requestOptions);
   }
 
-  getFavorites() {    
+  put(product) {
+    console.log(product._id);
+    return this.api.put(`${this.endpoint}/${product._id}`, product);
+  }
+  
+  getFavorites() {
     return this.storage.getProductFavorites();
   }
-
+  
   loadFavoritesFromServer() {        
     let params: URLSearchParams = new URLSearchParams();
     params.set('isFavorite', "true"); 

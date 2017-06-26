@@ -48,6 +48,21 @@ export class TunariApi {
       .map(resp => resp.json().data);
   }
 
+  put(endpoint: string, body: any) {
+    let url = this.baseUrl + endpoint;
+    let requestOptions = new RequestOptions();
+    requestOptions.headers = new Headers(this.headers);
+
+    return this.getApiToken().flatMap(token => {
+      if(token) {
+        requestOptions.headers.append(this.authKey, 'Bearer ' + token);      
+      }
+
+      return this.http.put(url, body, requestOptions)
+        .map(resp => resp.json().data);
+    });
+  }
+
   getImage(productUrl: string) {
     let requestOptions = new RequestOptions({ 
       headers: new Headers(this.headers), 

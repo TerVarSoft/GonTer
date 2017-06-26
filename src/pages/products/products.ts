@@ -8,6 +8,7 @@ import "rxjs/add/operator/distinctUntilChanged"
 import "rxjs/add/operator/switchMap";
 
 import { ProductDetailPage } from './product-detail/product-detail';
+import { ProductUpdatePage } from './product-update/product-update';
 
 import { Connection } from '../../providers/connection';
 import { Products } from '../../providers/products';
@@ -50,6 +51,8 @@ export class ProductsPage {
     this.initSearchQuery();
   }    
 
+  /** Main Page functions */
+
   public pullNextProductsPage(infiniteScroll) {
         
     if(this.page > 0 && this.connection.isConnected()) {
@@ -67,17 +70,13 @@ export class ProductsPage {
     } else {
       infiniteScroll.complete();
     }    
-  }
-
-  goToProductDetails(product: Product) {
-    this.navCtrl.push(ProductDetailPage, {
-      product: product
-    });
-  }
+  }  
 
   onSearchClear(event) {
     this.blurSearchBar();
   }
+
+  /** Main Fab button functions. */
 
   selectPriceToShow(fab: FabContainer) {
     fab.close();
@@ -92,6 +91,45 @@ export class ProductsPage {
     });
     alert.present();
   }
+
+  createProduct(fab: FabContainer) {
+    fab.close();
+    this.navCtrl.push(ProductUpdatePage, {
+      product: new Product()
+    });
+  }
+
+  /** Individual Products functions. */
+
+  goToProductDetails(product: Product) {
+    this.navCtrl.push(ProductDetailPage, {
+      product: product
+    });
+  }
+
+  addPriceWhenNoPrice(event, product:Product) {
+    event.stopPropagation();
+
+    let alert: Alert = this.util.getAddPriceAlert(product, this.selectedPrice);    
+    alert.addButton({
+      text: 'Guardar',
+      handler: data => {
+        let saveProductLoader = this.notifier.createLoader(`Salvando ${product.name}`);
+        product[this.selectedPrice] = data.price;
+        this.productsProvider.put(product).subscribe(() => {
+          saveProductLoader.dismiss();
+          
+          if(product.isFavorite) {
+            this.updateFavoritesInBackground();
+          }
+        });
+      }
+    });
+
+    alert.present();
+  }
+
+  /** Private functions */
 
   private setDefaultValues() {
     this.selectedPrice = "clientPackagePrice";
@@ -117,7 +155,7 @@ export class ProductsPage {
       if(productsObject) {
         console.log("Favorites pulled from storage...");
         this.products = productsObject.items;
-        this.productsProvider.loadFavoritesFromServer().subscribe();
+        this.updateFavoritesInBackground();
       } else {
         console.log("Favorites pulled from the server...");
         let loader = this.notifier.createLoader("Cargando Novedades");
@@ -126,11 +164,17 @@ export class ProductsPage {
           .subscribe(products => {
             this.products = products
             loader.dismiss();
-          });          
+          });
       }
     });
   }
 
+  private updateFavoritesInBackground() {
+    // Update storage in backgroun with server response.
+    console.log("Updating product favorites in background");
+    this.productsProvider.loadFavoritesFromServer().subscribe();
+  }
+  
   private initSearchQuery() {
     this.searchQuery.valueChanges
       .filter(query => query)

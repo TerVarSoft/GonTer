@@ -54,9 +54,9 @@ export class SettingsCache {
   }
 
   private buildPriceTypes() {
-    this.priceTypes.set("clientUnitPrice", "Unidad Publico"); 
-    this.priceTypes.set("clientPackagePrice", "Paquete Publico"); 
-    this.priceTypes.set("publicUnitPrice", "Unidad Cliente"); 
-    this.priceTypes.set("publicPackagePrice", "Paquete cliente");     
+    this.priceTypes.set("clientUnitPrice", "Unidad Cliente"); 
+    this.priceTypes.set("clientPackagePrice", "Paquete Cliente"); 
+    this.priceTypes.set("publicUnitPrice", "Unidad Publico"); 
+    this.priceTypes.set("publicPackagePrice", "Paquete Publico");     
   }
 }

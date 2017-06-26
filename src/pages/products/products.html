@@ -30,7 +30,7 @@
         </p>
       </ion-item>
       <ion-item-options side="right">
-        <button ion-button color="primary">
+        <button ion-button (click)="addPriceWhenNoPrice($event, product)" color="primary">
           <ion-icon name="pricetag"></ion-icon>
           Precio
         </button>
@@ -41,7 +41,8 @@
   <ion-fab bottom right #fab>
     <button ion-fab color="secondary"><ion-icon name="filing"></ion-icon></button>
     <ion-fab-list side="top">
-      <button ion-fab color="secondary-200" (click)="selectPriceToShow(fab)"><ion-icon name="pricetags"></ion-icon></button>      
+      <button ion-fab color="secondary-200" (click)="selectPriceToShow(fab)"><ion-icon name="pricetags"></ion-icon></button>
+      <button ion-fab color="secondary-200" (click)="createProduct(fab)"><ion-icon name="add"></ion-icon></button>
     </ion-fab-list>
   </ion-fab>
 

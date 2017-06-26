@@ -11,6 +11,7 @@ import { Network } from "@ionic-native/network";
 import { GrafTunariApp } from './app.component';
 import { ProductsPage } from '../pages/products/products';
 import { ProductDetailPage } from '../pages/products/product-detail/product-detail';
+import { ProductUpdatePage } from '../pages/products/product-update/product-update';
 import { LoginPage } from '../pages/login/login';
 import { ProductImgComponent } from '../pages/products/product-img/product-img.component';
 import { SafeUrlPipe } from '../pipes/safe-url.pipe';
@@ -49,6 +50,7 @@ export function providers() {
     GrafTunariApp,
     ProductsPage,
     ProductDetailPage,
+    ProductUpdatePage,
     LoginPage,
     ProductImgComponent,
     SafeUrlPipe
@@ -64,6 +66,7 @@ export function providers() {
     GrafTunariApp,
     ProductsPage,
     ProductDetailPage,
+    ProductUpdatePage,
     LoginPage
   ],
   providers: providers()

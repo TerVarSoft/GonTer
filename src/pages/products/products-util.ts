@@ -38,6 +38,26 @@ export class ProductsUtil {
     return alert;
   }
 
+  getAddPriceAlert(product: Product, selectedPriceType: string) {
+    let alert = this.alertCtrl.create({
+      title: product.name,
+      message: this.getSelectedPriceText(selectedPriceType),
+      inputs: [
+        {
+          name: 'price',
+          placeholder: 'Agrega un precio!'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel'
+        }
+      ]
+    });
+    
+    return alert;
+  }
+
   getSelectedPriceText(key): string {    
     return this.settingsProvider.getPriceTypeText(key);
   }
