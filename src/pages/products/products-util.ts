@@ -58,6 +58,20 @@ export class ProductsUtil {
     return alert;
   }
 
+  getRemoveProductAlert(productName: string) {
+    let alert = this.alertCtrl.create({
+      title: 'Borrando!',
+      message: `Estas Seguro de borrar el producto ${productName}`,
+      buttons: [
+        {
+          text: 'Cancelar',
+        }
+      ]
+    });
+
+    return alert;
+  }
+
   getSelectedPriceText(key): string {    
     return this.settingsProvider.getPriceTypeText(key);
   }

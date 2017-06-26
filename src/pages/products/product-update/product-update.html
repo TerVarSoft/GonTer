@@ -1,5 +1,109 @@
 <ion-header>
   <ion-navbar color="primary">
-    <ion-title >Crear Producto</ion-title>
+    <ion-title >{{product.name || "Crear Producto"}}</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()">
+        Guardar
+      </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
+
+<ion-content>  
+  <ion-segment [(ngModel)]="segment" color="secondary">
+      <ion-segment-button value="general">
+          General
+      </ion-segment-button>
+      <ion-segment-button value="prices">
+          Precios
+      </ion-segment-button>
+      <ion-segment-button value="locations">
+          Ubicaciones
+      </ion-segment-button>
+  </ion-segment>
+
+  <div [ngSwitch]="segment">
+    <div *ngSwitchCase="'general'">
+      <ion-list>
+        <ion-item>
+          <ion-label>Categoria</ion-label>
+          <ion-select [(ngModel)]="product.category" interface="popover">
+            <ion-option *ngFor="let category of categories" [value]="category.name">
+              {{category.name}}
+            </ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Nombre</ion-label>
+          <ion-input [(ngModel)]="product.name" type="text" novalidate></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Cantidad</ion-label>
+          <ion-input [(ngModel)]="product.quantity" type="number"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Cantidad por paquete</ion-label>
+          <ion-input [(ngModel)]="product.quantityPerPackage" type="number"></ion-input>
+        </ion-item>
+
+        <ion-list-header>
+          Etiquetas
+          <button ion-button outline item-end icon-left (click)="addTag()">
+            <ion-icon name="add"></ion-icon>
+            Agregar
+          </button>
+        </ion-list-header>
+
+        <ion-item *ngFor="let tag of product.tags">
+            {{tag}}
+          <ion-icon name="close-circle" color="primary" item-end (click)="removeTag(tag)"></ion-icon>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <div *ngSwitchCase="'prices'">
+      <ion-item-group>
+        <ion-item-divider color="primary-50">Precios Cliente</ion-item-divider>
+        <ion-item>
+          <ion-label>Unidad</ion-label>
+          <ion-input [(ngModel)]="product.clientUnitPrice" type="number"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Paquete</ion-label>
+          <ion-input [(ngModel)]="product.clientPackagePrice" type="number"></ion-input>
+        </ion-item>
+        <ion-item-divider color="primary-50">Precios Publicos</ion-item-divider>
+        <ion-item>
+          <ion-label>Unidad</ion-label>
+          <ion-input [(ngModel)]="product.publicUnitPrice" type="number"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Paquete</ion-label>
+          <ion-input [(ngModel)]="product.publicPackagePrice" type="number"></ion-input>
+        </ion-item>
+      </ion-item-group>
+    </div>
+
+    <div *ngSwitchCase="'locations'">
+      <ion-list>
+        <ion-list-header>
+          <button ion-button outline item-start icon-left (click)="addStoreLocation()">
+            <ion-icon name="add"></ion-icon>
+            Tienda
+          </button>
+          <button ion-button outline item-end icon-left (click)="addWarehouseLocation()">
+            <ion-icon name="add"></ion-icon>
+            Deposito
+          </button>
+        </ion-list-header>
+
+        <ion-item *ngFor="let location of product.locations" class="text-color">
+          {{location.value}} ({{location.type}})
+          <ion-icon item-end name="close-circle" color="primary" (click)="removeLocation(location)">
+          </ion-icon>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

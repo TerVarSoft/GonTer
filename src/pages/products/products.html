@@ -24,10 +24,13 @@
           <product-img [product]="product"></product-img>
         </ion-thumbnail>
         <h2 class="text-color">{{product.name}}</h2>
-        <h3 class="text-color">{{product.properties.type}}</h3>
+        <h3 class="text-color">{{product.properties?.type}}</h3>
         <p *ngIf="product[selectedPrice]">
           {{selectedPriceText}}: {{product[selectedPrice]}} Bs.
         </p>
+        
+        <ion-icon item-end (click)="openProductOptions($event, product)" color="primary" name="more"></ion-icon>        
+        
       </ion-item>
       <ion-item-options side="right">
         <button ion-button (click)="addPriceWhenNoPrice($event, product)" color="primary">

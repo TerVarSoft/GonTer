@@ -1,6 +1,6 @@
 import { Component, ElementRef, Renderer } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { NavController, Alert, FabContainer } from 'ionic-angular';
+import { NavController, ActionSheetController, Platform, Alert, FabContainer } from 'ionic-angular';
 import { Keyboard } from '@ionic-native/keyboard';
 import 'rxjs/add/observable/from';
 import "rxjs/add/operator/debounceTime";
@@ -35,7 +35,9 @@ export class ProductsPage {
 
   private selectedPriceText: string;
 
-  constructor(public navCtrl: NavController,    
+  constructor(public platform: Platform,
+    public navCtrl: NavController,
+    public actionSheetCtrl: ActionSheetController,
     public keyboard: Keyboard,
     public renderer: Renderer,
     private elRef:ElementRef,
@@ -129,6 +131,41 @@ export class ProductsPage {
     alert.present();
   }
 
+  openProductOptions(event, product) {
+    event.stopPropagation();
+    
+    let actionSheet = this.actionSheetCtrl.create({
+      title: product.name,
+      cssClass: 'product-options',
+      buttons: [
+        {
+          text: 'Ver',
+          icon: !this.platform.is('ios') ? 'eye' : null,
+          handler: () => {
+            this.navCtrl.push(ProductDetailPage, {
+              product: product
+            });
+          }
+        },{
+          text: 'Editar',
+          icon: !this.platform.is('ios') ? 'create' : null,
+          handler: () => {
+            this.navCtrl.push(ProductUpdatePage, {
+              product: product
+            });
+          }
+        },{
+          text: 'Eliminar',
+          icon: !this.platform.is('ios') ? 'trash' : null,
+          handler: () => {
+            this.removeProduct(product);
+          }
+        }
+      ]
+    });
+    actionSheet.present();
+  }
+
   /** Private functions */
 
   private setDefaultValues() {
@@ -147,6 +184,25 @@ export class ProductsPage {
     const searchInput = this.elRef.nativeElement.querySelector('.searchbar-input')    
     this.renderer
       .invokeElementMethod(searchInput, 'blur');
+  }
+
+  private removeProduct(productToDelete) {
+    let removeProductAlert: Alert = this.util.getRemoveProductAlert(productToDelete.name);
+
+    removeProductAlert.addButton({
+      text: 'Borralo!',
+      handler: () => {
+        let removeProductLoader= 
+          this.notifier.createLoader(`Borrando el Producto ${productToDelete.name}`);
+        this.productsProvider.remove(productToDelete).subscribe(() => {
+          this.products = 
+            this.products.filter(product => product.name !== productToDelete.name)
+          removeProductLoader.dismiss();
+        });
+      }
+    });
+
+    removeProductAlert.present();
   }
 
   private initFavorites() {

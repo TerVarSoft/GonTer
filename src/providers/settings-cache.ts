@@ -21,7 +21,11 @@ export class SettingsCache {
 
   getImgServerUrl() : string {
     return this.settings.filter(setting => setting.key === 'imgServer')[0].value;
-  }  
+  }
+
+  getProductCategories() : string[] {    
+    return this.settings.filter(setting => setting.key === 'productCategories')[0].value;
+  } 
 
   getPriceTypes() : Map<string, string> {    
     return this.priceTypes;

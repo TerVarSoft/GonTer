@@ -28,11 +28,26 @@ export class Products {
     return this.api.get(this.endpoint, requestOptions);
   }
 
-  put(product) {
-    console.log(product._id);
+  save(product) {    
+    if(product._id) {
+      return this.put(product);
+    } else {
+      return this.post(product);
+    }
+  }
+
+  post(product) {
+    return this.api.post(this.endpoint, product);
+  }
+
+  put(product) {    
     return this.api.put(`${this.endpoint}/${product._id}`, product);
   }
   
+  remove(product) {
+    return this.api.remove(`${this.endpoint}/${product._id}`);
+  }
+
   getFavorites() {
     return this.storage.getProductFavorites();
   }

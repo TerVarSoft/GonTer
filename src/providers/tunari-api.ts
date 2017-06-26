@@ -41,11 +41,18 @@ export class TunariApi {
 
   post(endpoint: string, body: any) {
     let url = this.baseUrl + endpoint;
-    let requestOptions = new RequestOptions({ headers: this.headers });
+    let requestOptions = new RequestOptions();
+    requestOptions.headers = new Headers(this.headers);
 
-    return this.http
-      .post(url, body, requestOptions)
-      .map(resp => resp.json().data);
+    return this.getApiToken().flatMap(token => {
+      if(token) {
+        requestOptions.headers.append(this.authKey, 'Bearer ' + token);      
+      }
+
+      return this.http
+        .post(url, body, requestOptions)
+        .map(resp => resp.json().data);
+    });
   }
 
   put(endpoint: string, body: any) {
@@ -63,6 +70,21 @@ export class TunariApi {
     });
   }
 
+  remove(endpoint: string) {
+    let url = this.baseUrl + endpoint;
+    let requestOptions = new RequestOptions();
+    requestOptions.headers = new Headers(this.headers);
+
+    return this.getApiToken().flatMap(token => {
+      if(token) {
+        requestOptions.headers.append(this.authKey, 'Bearer ' + token);      
+      }
+
+      return this.http.delete(url, requestOptions)
+        .map(resp => resp.json());
+    });
+  }
+
   getImage(productUrl: string) {
     let requestOptions = new RequestOptions({ 
       headers: new Headers(this.headers), 
@@ -76,13 +98,11 @@ export class TunariApi {
 
       return this.http.get(productUrl, requestOptions)
         .map(res => res.blob())
-        .map(blob => URL.createObjectURL(blob))
-        //.map(url => this.sanitizer.bypassSecurityTrustResourceUrl(url));
+        .map(blob => URL.createObjectURL(blob))        
     });      
   }
 
   private getApiToken(): Observable<Headers> {
-    return Observable.fromPromise(this.storage.getAuthtoken())
-      .filter(token => token !== null);
+    return Observable.fromPromise(this.storage.getAuthtoken());      
   }
 }
