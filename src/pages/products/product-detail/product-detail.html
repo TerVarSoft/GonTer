@@ -1,6 +1,12 @@
 <ion-header>
   <ion-navbar color="primary">
     <ion-title >{{product.name}}</ion-title>
+
+    <ion-buttons end>
+      <button ion-button icon-only color="royal" (click)="editProduct()">
+        <ion-icon name="create"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
@@ -26,7 +32,18 @@
       <div class="product-detail" padding>
         <h2 class="text-color">{{product.name}}</h2>
         <p class="text-color">{{product.properties?.type || product.category}}</p>
-      </div>      
+      </div>
+      
+      <ion-item-group>
+        <ion-item *ngIf="product.quantity">
+          <h2>Cantidad en deposito</h2>
+          <p item-right>{{product.quantity}}</p>
+        </ion-item>
+        <ion-item *ngIf="product.quantityPerPackage">
+          <h2>Cantidad por paquete</h2>
+          <p item-right>{{product.quantityPerPackage}}</p>
+        </ion-item>
+      </ion-item-group>
 
       <ion-item-group>
         <ion-item-divider color="primary-50" class="text-color">

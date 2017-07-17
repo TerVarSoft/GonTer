@@ -45,6 +45,7 @@ export class ProductsUtil {
       inputs: [
         {
           name: 'price',
+          type: 'number',
           placeholder: 'Agrega un precio!'
         },
       ],

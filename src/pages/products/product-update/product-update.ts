@@ -14,11 +14,17 @@ import { Product } from '../../../models/product';
 })
 export class ProductUpdatePage {
 
+  private INVITATION_TYPE: string = 'Invitaciones';
+
   segment = 'general';
+
+  isInvitation: boolean;
 
   product: Product;
 
   categories: any[];
+
+  invitationTypes: string[];
 
   constructor(public navParams: NavParams,
     private alertCtrl: AlertController,
@@ -26,13 +32,20 @@ export class ProductUpdatePage {
     public productsProvider: Products,
     public notifier: TunariNotifier,
     private settingsProvider: SettingsCache) {
-    this.product = this.navParams.data.product;    
+    this.product = this.navParams.data.product;
+
     this.categories = settingsProvider.getProductCategories();
-    this.product.category = this.categories[0].name;
+    this.invitationTypes = settingsProvider.getInvitationTypes();
+
+    this.product.category = this.product.category || this.categories[0].name;
+    this.product.properties = this.product.properties || {};
+    this.product.properties.type = this.product.properties.type || this.invitationTypes[0];
     this.product.tags = this.product.tags || [];
     this.product.properties = this.product.properties || {type: "", size: "", genre: ""};
     this.product.locations = this.product.locations || [];
-  }  
+
+    this.isInvitation = this.product.category == this.INVITATION_TYPE;
+  }
 
   addTag() {
     let addTagAlert = this.alertCtrl.create({

@@ -25,6 +25,10 @@ export class SettingsCache {
 
   getProductCategories() : string[] {    
     return this.settings.filter(setting => setting.key === 'productCategories')[0].value;
+  }
+
+  getInvitationTypes() : string[] {    
+    return this.settings.filter(setting => setting.key === 'invitationTypes')[0].value;
   } 
 
   getPriceTypes() : Map<string, string> {    

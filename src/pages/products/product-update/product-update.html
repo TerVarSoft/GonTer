@@ -34,6 +34,14 @@
             </ion-option>
           </ion-select>
         </ion-item>
+        <ion-item *ngIf="isInvitation">
+          <ion-label>Tipo</ion-label>
+          <ion-select [(ngModel)]="product.properties.type" interface="popover">
+            <ion-option *ngFor="let invitationType of invitationTypes" [value]="invitationType">
+              {{invitationType}}
+            </ion-option>
+          </ion-select>
+        </ion-item>
         <ion-item>
           <ion-label>Nombre</ion-label>
           <ion-input [(ngModel)]="product.name" type="text" novalidate></ion-input>
