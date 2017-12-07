@@ -13,7 +13,7 @@ export class TunariMessages {
   loadingSettings: string = `Cargando configuraciones basicas`;
 
   noInternetError: string = `No estas conectado a Internet!,
-        por favor verifica tu conexion y vuelve a intentarl`;      
+        por favor verifica tu conexion y vuelve a intentarlo`;
 
   invalidUser: string = `Tus usuario o tu passwords son incorrectos!`;
 
