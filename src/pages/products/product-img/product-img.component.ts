@@ -1,4 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { NavController } from 'ionic-angular';
+
+import { ProductPreviewPage } from '../product-preview/product-preview';
 
 import { TunariApi } from '../../../providers/tunari-api';
 
@@ -12,9 +15,9 @@ export class ProductImgComponent implements OnInit {
 
   @Input() product: Product;
 
-  url: String = 'assets/img/loading.gif';
+  url: string = 'assets/img/loading.gif';
 
-  constructor(public api: TunariApi) {}
+  constructor(public navCtrl: NavController, public api: TunariApi) {}
 
   ngOnInit() {
     
@@ -26,9 +29,19 @@ export class ProductImgComponent implements OnInit {
       error => {
         if(error.status === 0) {
           this.url = 'assets/img/errorLoading.gif';
+          this.product.thumbnailUrl = this.url;
         } else if(error.status === 404) {
           this.url = 'assets/img/defaultProduct.png';
+          this.product.thumbnailUrl = this.url;
         }
       });
+  }
+
+  openImage(event, product: Product) {
+    event.stopPropagation();
+
+    this.navCtrl.push(ProductPreviewPage, {
+      product: product
+    });
   }
 }

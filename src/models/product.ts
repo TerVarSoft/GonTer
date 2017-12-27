@@ -25,6 +25,10 @@ export class Product {
 
   thumbnailUrl: string;
 
+  previewUrl: string;
+
+  imageUrl: string;
+
   provider: string;
 
   quantityPerPackage: number;

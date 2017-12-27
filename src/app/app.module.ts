@@ -12,6 +12,7 @@ import { GrafTunariApp } from './app.component';
 import { ProductsPage } from '../pages/products/products';
 import { ProductDetailPage } from '../pages/products/product-detail/product-detail';
 import { ProductUpdatePage } from '../pages/products/product-update/product-update';
+import { ProductPreviewPage } from '../pages/products/product-preview/product-preview';
 import { LoginPage } from '../pages/login/login';
 import { ProductImgComponent } from '../pages/products/product-img/product-img.component';
 import { SafeUrlPipe } from '../pipes/safe-url.pipe';
@@ -51,6 +52,7 @@ export function providers() {
     ProductsPage,
     ProductDetailPage,
     ProductUpdatePage,
+    ProductPreviewPage,
     LoginPage,
     ProductImgComponent,
     SafeUrlPipe
@@ -67,6 +69,7 @@ export function providers() {
     ProductsPage,
     ProductDetailPage,
     ProductUpdatePage,
+    ProductPreviewPage,
     LoginPage
   ],
   providers: providers()

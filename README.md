@@ -22,17 +22,18 @@ to manage tunari services
     Following steps from: http://ionicframework.com/docs/v1/guide/publishing.html
 
     * Remove not needed plugins for production mode, so far: 
-        ionic cordova plugin rm cordova-plugin-console        
+        ionic cordova plugin rm cordova-plugin-console
     * Build release build for android
         ionic cordova build --release android
     * Use already created private key, request to the team members. Just for documentation this key was generated with this command, should not be created again (keytool in jdk, usually: c:\Program Files\Java\jdk1.8.0_74\):
         keytool -genkey -v -keystore gonter.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000
-    * Sing th unsigned APK.  The unsigned apk should be find in platforms/android/build/outputs/apk/android-release-unsigned.apk (jarsigner in jdk, usually: c:\Program Files\Java\jdk1.8.0_74\):
+    * Sing the unsigned APK.  The unsigned apk should be find in platforms/android/build/outputs/apk/android-release-unsigned.apk (jarsigner in jdk, usually: c:\Program Files\Java\jdk1.8.0_74\):
         jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore gonter.keystore android-release-unsigned.apk alias_name
     * Zip align (android sdk, usually: c:\Android\sdk\build-tools\23.0.3\):
         zipalign -v 4 android-release-unsigned.apk Gonter.apk
     
-
+    * Finally you can upload your Gonter.apk to: https://play.google.com/apps/publish/
+    
 # Ionic default documentation
 
 This is a starter template for [Ionic](http://ionicframework.com/docs/) projects.

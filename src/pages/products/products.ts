@@ -18,7 +18,7 @@ import { TunariNotifier } from '../../providers/tunari-notifier';
 
 import { Product } from '../../models/product';
 
-@Component({  
+@Component({
   selector: 'page-products',
   templateUrl: 'products.html',
   providers: [ProductsUtil]
@@ -28,7 +28,7 @@ export class ProductsPage {
   private products: Product[];
 
   private searchQuery: FormControl = new FormControl();
-  
+
   private page: number = 0;
 
   private selectedPrice: string;
@@ -40,39 +40,39 @@ export class ProductsPage {
     public actionSheetCtrl: ActionSheetController,
     public keyboard: Keyboard,
     public renderer: Renderer,
-    private elRef:ElementRef,
+    private elRef: ElementRef,
     public productsProvider: Products,
-    public util: ProductsUtil, 
+    public util: ProductsUtil,
     public notifier: TunariNotifier,
     public messages: TunariMessages,
     public connection: Connection) {
-    
+
     this.setDefaultValues();
     this.setupKeyboard();
-    this.initFavorites();    
+    this.initFavorites();
     this.initSearchQuery();
-  }    
+  }
 
   /** Main Page functions */
 
   public pullNextProductsPage(infiniteScroll) {
-        
-    if(this.page > 0 && this.connection.isConnected()) {
-      this.page ++;
+
+    if (this.page > 0 && this.connection.isConnected()) {
+      this.page++;
       console.log('Pulling page ' + this.page + '...');
       this.productsProvider.get(this.searchQuery.value, this.page)
-      .map(productsObject => productsObject.items)
-      .subscribe( 
+        .map(productsObject => productsObject.items)
+        .subscribe(
         products => this.products.push(...products),
         null,
         () => {
           infiniteScroll.complete();
           console.log('Finished pulling page successfully');
-      });
+        });
     } else {
       infiniteScroll.complete();
-    }    
-  }  
+    }
+  }
 
   onSearchClear(event) {
     this.blurSearchBar();
@@ -83,7 +83,7 @@ export class ProductsPage {
   selectPriceToShow(fab: FabContainer) {
     fab.close();
     let alert: Alert = this.util.getSelectPriceAlert(this.selectedPrice);
-        
+
     alert.addButton({
       text: 'OK',
       handler: key => {
@@ -109,10 +109,10 @@ export class ProductsPage {
     });
   }
 
-  addPriceWhenNoPrice(event, product:Product) {
+  addPriceWhenNoPrice(event, product: Product) {
     event.stopPropagation();
 
-    let alert: Alert = this.util.getAddPriceAlert(product, this.selectedPrice);    
+    let alert: Alert = this.util.getAddPriceAlert(product, this.selectedPrice);
     alert.addButton({
       text: 'Guardar',
       handler: data => {
@@ -120,8 +120,8 @@ export class ProductsPage {
         product[this.selectedPrice] = data.price;
         this.productsProvider.put(product).subscribe(() => {
           saveProductLoader.dismiss();
-          
-          if(product.isFavorite) {
+
+          if (product.isFavorite) {
             this.updateFavoritesInBackground();
           }
         });
@@ -133,7 +133,7 @@ export class ProductsPage {
 
   openProductOptions(event, product) {
     event.stopPropagation();
-    
+
     let actionSheet = this.actionSheetCtrl.create({
       title: product.name,
       cssClass: 'product-options',
@@ -146,7 +146,7 @@ export class ProductsPage {
               product: product
             });
           }
-        },{
+        }, {
           text: 'Editar',
           icon: !this.platform.is('ios') ? 'create' : null,
           handler: () => {
@@ -154,7 +154,7 @@ export class ProductsPage {
               product: product
             });
           }
-        },{
+        }, {
           text: 'Eliminar',
           icon: !this.platform.is('ios') ? 'trash' : null,
           handler: () => {
@@ -170,7 +170,7 @@ export class ProductsPage {
 
   private setDefaultValues() {
     this.selectedPrice = "clientPackagePrice";
-    this.selectedPriceText 
+    this.selectedPriceText
       = this.util.getSelectedPriceText(this.selectedPrice);
   }
 
@@ -181,7 +181,7 @@ export class ProductsPage {
   }
 
   private blurSearchBar() {
-    const searchInput = this.elRef.nativeElement.querySelector('.searchbar-input')    
+    const searchInput = this.elRef.nativeElement.querySelector('.searchbar-input')
     this.renderer
       .invokeElementMethod(searchInput, 'blur');
   }
@@ -192,10 +192,10 @@ export class ProductsPage {
     removeProductAlert.addButton({
       text: 'Borralo!',
       handler: () => {
-        let removeProductLoader= 
+        let removeProductLoader =
           this.notifier.createLoader(`Borrando el Producto ${productToDelete.name}`);
         this.productsProvider.remove(productToDelete).subscribe(() => {
-          this.products = 
+          this.products =
             this.products.filter(product => product.name !== productToDelete.name)
           removeProductLoader.dismiss();
         });
@@ -208,7 +208,7 @@ export class ProductsPage {
   private initFavorites() {
     this.page = 0;
     this.productsProvider.getFavorites().then(productsObject => {
-      if(productsObject) {
+      if (productsObject) {
         console.log("Favorites pulled from storage...");
         this.products = productsObject.items;
         this.updateFavoritesInBackground();
@@ -230,7 +230,7 @@ export class ProductsPage {
     console.log("Updating product favorites in background");
     this.productsProvider.loadFavoritesFromServer().subscribe();
   }
-  
+
   private initSearchQuery() {
     this.searchQuery.valueChanges
       .filter(query => query)
@@ -248,7 +248,7 @@ export class ProductsPage {
       .filter(query => query)
       .filter(query => !this.connection.isConnected())
       .subscribe(() => this.notifier.createToast(this.messages.noInternetError));
-    
+
     this.searchQuery.valueChanges
       .filter(query => !query)
       .subscribe(() => this.initFavorites());
