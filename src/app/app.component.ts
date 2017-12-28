@@ -4,6 +4,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Network } from "@ionic-native/network";
 
+import * as moment from 'moment';
+
 import { LoginPage } from '../pages/login/login';
 
 import { Connection } from '../providers/connection';
@@ -35,6 +37,8 @@ export class GrafTunariApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
+
+      moment.locale('es');
 
       this.network.onDisconnect().subscribe(() => {
         this.notifier.createToast(this.messages.noInternetError);

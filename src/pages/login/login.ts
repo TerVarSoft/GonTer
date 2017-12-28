@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { NavController } from 'ionic-angular';
 
-import { ProductsPage } from '../../pages/products/products';
+import { ProductsTabsPage } from '../../pages/products-tabs/products-tabs';
 
 import { Login } from '../../providers/login';
 import { SettingsCache } from '../../providers/settings-cache';
@@ -66,7 +66,7 @@ export class LoginPage {
     this.settingsProvider.loadFromStorage().then(settings => {
       if(settings) {
         console.log("Settings loaded from local storage...");
-        this.navCtrl.setRoot(ProductsPage);
+        this.navCtrl.setRoot(ProductsTabsPage);
 
         console.log("Updating settings from server in background...");
         this.settingsProvider.loadFromServer().subscribe();
@@ -74,7 +74,7 @@ export class LoginPage {
         let loader = this.notifier.createLoader(this.messages.loadingSettings);
         this.settingsProvider.loadFromServer().subscribe(() => {
           console.log("Settings loaded from the server...");
-          this.navCtrl.setRoot(ProductsPage);
+          this.navCtrl.setRoot(ProductsTabsPage);
           loader.dismiss();
         });
       }

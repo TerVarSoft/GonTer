@@ -14,7 +14,7 @@ import { TunariStorage } from './tunari-storage';
 @Injectable()
 export class TunariApi {
 
-  baseUrl: string = 'https://tunariserver.herokuapp.com/api/';
+  baseUrl: string = 'https://tunariserver.herokuapp.com/api/';  
 
   authKey: string = 'authorization';
 

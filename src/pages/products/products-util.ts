@@ -46,7 +46,8 @@ export class ProductsUtil {
         {
           name: 'price',
           type: 'number',
-          placeholder: 'Agrega un precio!'
+          placeholder: 'Agrega un precio!',
+          value: "" + product[selectedPriceType]
         },
       ],
       buttons: [
@@ -56,6 +57,49 @@ export class ProductsUtil {
       ]
     });
     
+    return alert;
+  }
+
+  getAddQuantityAlert(product: Product) {
+    let alert = this.alertCtrl.create({
+      title: product.name,
+      message: "Cantidad",
+      inputs: [
+        {
+          name: 'quantity',
+          type: 'number',
+          placeholder: 'Especifica la cantidad!',
+          value: "" + product.quantity
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel'
+        }
+      ]
+    });
+        
+    return alert;
+  }
+
+  getCreateSellingAlert(product: Product) {
+    let alert = this.alertCtrl.create({
+      title: "Nueva Venta" ,
+      message: product.name,
+      inputs: [
+        {
+          name: 'quantity',
+          type: 'number',
+          placeholder: 'Especifica la cantidad!'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel'
+        }
+      ]
+    });
+        
     return alert;
   }
 

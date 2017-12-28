@@ -12,11 +12,13 @@ import { ProductUpdatePage } from './product-update/product-update';
 
 import { Connection } from '../../providers/connection';
 import { Products } from '../../providers/products';
+import { Sellings } from '../../providers/sellings';
 import { ProductsUtil } from './products-util';
 import { TunariMessages } from '../../providers/tunari-messages';
 import { TunariNotifier } from '../../providers/tunari-notifier';
 
 import { Product } from '../../models/product';
+import { Selling } from '../../models/selling';
 
 @Component({
   selector: 'page-products',
@@ -42,6 +44,7 @@ export class ProductsPage {
     public renderer: Renderer,
     private elRef: ElementRef,
     public productsProvider: Products,
+    public sellingsProvider: Sellings,
     public util: ProductsUtil,
     public notifier: TunariNotifier,
     public messages: TunariMessages,
@@ -122,6 +125,58 @@ export class ProductsPage {
           saveProductLoader.dismiss();
 
           if (product.isFavorite) {
+            this.updateFavoritesInBackground();
+          }
+        });
+      }
+    });
+
+    alert.present();
+  }
+
+  setProductQuantity(event, product: Product) {
+    event.stopPropagation();
+
+    let alert: Alert = this.util.getAddQuantityAlert(product);
+    alert.addButton({
+      text: 'Guardar',
+      handler: data => {
+        let saveProductLoader = this.notifier.createLoader(`Salvando ${product.name}`);
+        product.quantity = data.quantity;
+        this.productsProvider.put(product).subscribe(() => {
+          saveProductLoader.dismiss();
+
+          if (product.isFavorite) {
+            this.updateFavoritesInBackground();
+          }
+        });
+      }
+    });
+
+    alert.present();
+  }
+
+  createSelling(event, product: Product) {
+    event.stopPropagation();
+
+    let alert: Alert = this.util.getCreateSellingAlert(product);
+    alert.addButton({
+      text: 'Guardar',
+      handler: data => {
+        let saveProductLoader = this.notifier.createLoader(`Salvando Venta: ${product.name}`);
+        
+        let newSelling = new Selling();
+        newSelling.productName = product.name;
+        newSelling.productType = product.properties.type;
+        newSelling.quantity = data.quantity;
+        
+        this.sellingsProvider.save(newSelling).subscribe(() => {
+          saveProductLoader.dismiss();
+
+          if (product.isFavorite && product.quantity) {
+            product.quantity -= data.quantity;
+            product.quantity = product.quantity < 0 ? 0 : product.quantity;
+
             this.updateFavoritesInBackground();
           }
         });

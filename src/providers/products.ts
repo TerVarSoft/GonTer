@@ -61,6 +61,14 @@ export class Products {
       .map(productsObject => {
         this.storage.setProductFavorites(productsObject);
         return productsObject;
-      });      
-  }  
+      });
+  }
+
+  getLowQuantity() {
+    let params: URLSearchParams = new URLSearchParams();
+    params.set('isLowQuantity', "true"); 
+    let requestOptions = new RequestOptions({search: params});
+
+    return this.api.get(this.endpoint, requestOptions);
+  }
 }

@@ -29,13 +29,23 @@
           {{selectedPriceText}}: {{product[selectedPrice]}} Bs.
         </p>
         
-        <ion-icon item-end (click)="openProductOptions($event, product)" color="primary" name="more"></ion-icon>        
+        <ion-icon item-end (click)="openProductOptions($event, product)" color="primary" name="more"></ion-icon>
         
       </ion-item>
-      <ion-item-options side="right">
+      <ion-item-options side="left">
         <button ion-button (click)="addPriceWhenNoPrice($event, product)" color="primary">
           <ion-icon name="pricetag"></ion-icon>
           Precio
+        </button>
+        <button ion-button (click)="setProductQuantity($event, product)" color="primary-700">
+          <ion-icon name="home"></ion-icon>
+          Cantid
+        </button>
+      </ion-item-options>
+      <ion-item-options side="right">
+        <button ion-button (click)="createSelling($event, product)" color="primary">
+          <ion-icon name="basket"></ion-icon>
+          Vender
         </button>
       </ion-item-options>
     </ion-item-sliding>
