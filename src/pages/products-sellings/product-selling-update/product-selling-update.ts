@@ -10,7 +10,6 @@ import { Sellings } from '../../../providers/sellings';
 
 import { Selling } from '../../../models/selling';
 import { Product } from '../../../models/product';
-import { ProductPrice } from '../../../models/product-price';
 
 @Component({
     selector: 'product-selling-update',

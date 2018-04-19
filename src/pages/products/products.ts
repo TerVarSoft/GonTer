@@ -19,7 +19,6 @@ import { TunariMessages } from '../../providers/tunari-messages';
 import { TunariNotifier } from '../../providers/tunari-notifier';
 
 import { Product } from '../../models/product';
-import { Selling } from '../../models/selling';
 
 @Component({
   selector: 'page-products',

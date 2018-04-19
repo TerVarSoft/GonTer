@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AlertController, Alert } from 'ionic-angular';
+import { AlertController } from 'ionic-angular';
 
 import { SettingsCache } from '../../providers/settings-cache';
 
