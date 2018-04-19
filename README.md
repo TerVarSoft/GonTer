@@ -21,11 +21,13 @@ to manage tunari services
 
     Following steps from: http://ionicframework.com/docs/v1/guide/publishing.html
 
-    * Remove not needed plugins for production mode, so far: 
+    * Upgrade config.xml by updating the version in:
+        <widget id="io.tervarsoft.gonter" version="0.0.7" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    * (Probably not needed anymore) Remove not needed plugins for production mode, so far.: 
         ionic cordova plugin rm cordova-plugin-console
     * Build release build for android
         ionic cordova build --release android
-    * Use already created private key, request to the team members. Just for documentation this key was generated with this command, should not be created again (keytool in jdk, usually: c:\Program Files\Java\jdk1.8.0_74\):
+    * Generate private key. Use already created private key, request to the team members. Just for documentation this key was generated     with this command, should not be created again (keytool in jdk, usually: c:\Program Files\Java\jdk1.8.0_74\):
         keytool -genkey -v -keystore gonter.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000
     * Sing the unsigned APK.  The unsigned apk should be find in platforms/android/build/outputs/apk/android-release-unsigned.apk (jarsigner in jdk, usually: c:\Program Files\Java\jdk1.8.0_74\):
         jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore gonter.keystore android-release-unsigned.apk alias_name

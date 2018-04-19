@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar color="primary">
-    <ion-title >{{product.name}}</ion-title>
+    <ion-title>{{product.name}}</ion-title>
 
     <ion-buttons end>
       <button ion-button icon-only color="royal" (click)="editProduct()">
@@ -12,28 +12,29 @@
 
 <ion-content>
   <div class="product-profile" text-center>
-    <img [src]="product.thumbnailUrl | safeUrl" style="max-height: 100px;"/>
-  </div>  
-  
+    <img [src]="product.thumbnailUrl | safeUrl" style="max-height: 100px;" />
+  </div>
+
   <ion-segment [(ngModel)]="segment" color="secondary">
-      <ion-segment-button value="general">
-          General
-      </ion-segment-button>
-      <ion-segment-button value="prices">
-          Precios
-      </ion-segment-button>
-      <ion-segment-button value="locations">
-          Ubicaciones
-      </ion-segment-button>
+    <ion-segment-button value="general">
+      General
+    </ion-segment-button>
+    <ion-segment-button value="prices">
+      Precios
+    </ion-segment-button>
+    <ion-segment-button value="locations">
+      Ubicaciones
+    </ion-segment-button>
   </ion-segment>
 
   <div [ngSwitch]="segment">
     <div *ngSwitchCase="'general'">
       <div class="product-detail" padding>
         <h2 class="text-color">{{product.name}}</h2>
+        <p class="text-color">{{product.description}}</p>
         <p class="text-color">{{product.properties?.type || product.category}}</p>
       </div>
-      
+
       <ion-item-group>
         <ion-item *ngIf="product.quantity">
           <h2>Cantidad en deposito</h2>
@@ -50,58 +51,40 @@
           Etiquetas
         </ion-item-divider>
         <ion-item *ngFor="let tag of product.tags" class="text-color">
-          {{tag}}        
+          {{tag}}
         </ion-item>
       </ion-item-group>
     </div>
 
     <ion-item-group *ngSwitchCase="'prices'">
       <ion-item-divider color="primary-50" class="text-color">
-        Precios de Imprenta
+        Lista de precios de venta
       </ion-item-divider>
-      <ion-item  *ngIf="product.clientUnitPrice" class="text-color">
-        {{product.clientUnitPrice}} Bs
+      <ion-item *ngFor="let priceType of priceTypes" class="text-color">
+        <div *ngIf="product.prices[priceType.id]?.value">
+          {{product.prices[priceType.id]?.value}} Bs
+        </div>
         <ion-note item-end>
-          Unidad
+          {{priceType.name}}
         </ion-note>
       </ion-item>
-      <ion-item *ngIf="product.clientPackagePrice" class="text-color">
-        {{product.clientPackagePrice}} Bs
-        <ion-note item-end>
-          Paquete {{product.quantityPerPackage ? (product.quantityPerPackage) : ""}}
-        </ion-note>
-      </ion-item>
-      <h6 *ngIf="!product.clientPackagePrice && !product.clientUnitPrice" padding class="text-color-light">
-        <ion-icon name="information-circle"></ion-icon>
-        Este producto no tiene precios de cliente
-      </h6>
-
       <ion-item-divider color="primary-50" class="text-color">
-        Precios Publicos
+        Otros Precios
       </ion-item-divider>
-      <ion-item *ngIf="product.publicUnitPrice" class="text-color">
-        {{product.publicUnitPrice}} Bs
+      <ion-item>
+        <div *ngIf="product.buyingUnitPrice">
+          {{product.buyingUnitPrice}} Bs
+        </div>
         <ion-note item-end>
-          Unidad
+          Precio de compra unitario
         </ion-note>
       </ion-item>
-      <ion-item *ngIf="product.publicPackagePrice" class="text-color">
-        {{product.publicPackagePrice}} Bs
-        <ion-note item-end>
-          Paquete {{product.quantityPerPackage ? product.quantityPerPackage : ""}}
-        </ion-note>
-      </ion-item>
-
-      <h6 *ngIf="!product.publicUnitPrice && !product.publicPackagePrice" padding class="text-color-light">
-        <ion-icon name="information-circle"></ion-icon>
-        Este producto no tiene precios publicos
-      </h6>
     </ion-item-group>
 
     <ion-item-group *ngSwitchCase="'locations'">
       <ion-item-divider color="primary-50" class="text-color">
         Ubicaciones
-      </ion-item-divider>      
+      </ion-item-divider>
       <ion-item *ngFor="let location of product.locations" class="text-color">
         {{location.value}}
         <ion-note item-end>

@@ -1,19 +1,28 @@
 <ion-header>
     <ion-navbar color="primary">
         <button ion-button menuToggle>
-        <ion-icon name="menu"></ion-icon>
-      </button>
+            <ion-icon name="menu"></ion-icon>
+        </button>
         <ion-title>
             Ventas
         </ion-title>
     </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content>
+    <ion-item>
+        <ion-label>Date</ion-label>
+        <ion-datetime displayFormat="MMM/DD/YYYY" monthNames="enero, febrero, marzo, abril, mayo, junio, agosto, septiembre, octubre, noviembre, diciembre"
+            monthShortNames="ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, di"
+            [(ngModel)]="filterDate" (ionChange)="filterByDate()"></ion-datetime>
+        <button item-end ion-button (click)="clearFilterDate()">
+            <ion-icon name="close"></ion-icon>
+        </button>
 
+    </ion-item>
     <ion-item-group *ngFor="let oneDaySellings of groupedSellings">
         <ion-item-divider color="light">{{oneDaySellings.day}}</ion-item-divider>
-        <ion-item *ngFor="let selling of oneDaySellings.sellings">
+        <ion-item *ngFor="let selling of oneDaySellings.sellings" (click)="editSelling(selling)">
             <h2 class="text-color">{{selling.productName}}</h2>
             <p class="text-color">{{selling.quantity}} Unidades</p>
             <ion-note item-end>{{selling.time}}</ion-note>
@@ -22,6 +31,6 @@
 
     <h6 *ngIf="groupedSellings.length <= 0" padding class="text-color-light">
         <ion-icon name="information-circle"></ion-icon>
-        Ventas registradas
+        Cargando...
     </h6>
 </ion-content>

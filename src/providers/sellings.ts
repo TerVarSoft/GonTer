@@ -1,4 +1,4 @@
-import { RequestOptions } from '@angular/http';
+import { RequestOptions, URLSearchParams } from '@angular/http';
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 
@@ -17,13 +17,19 @@ export class Sellings {
   constructor(public api: TunariApi) { }
 
   get() {
-    let requestOptions = new RequestOptions();
+    return this.api.get(this.endpoint);
+  }
+
+  getByDate(date: Date) {
+    let params: URLSearchParams = new URLSearchParams();
+    params.set('createdAt', String(date));
+    let requestOptions = new RequestOptions({ search: params });
 
     return this.api.get(this.endpoint, requestOptions);
   }
 
   save(selling) {
-    if(selling._id) {
+    if (selling._id) {
       return this.put(selling);
     } else {
       return this.post(selling);
@@ -37,8 +43,12 @@ export class Sellings {
   put(selling) {
     return this.api.put(`${this.endpoint}/${selling._id}`, selling);
   }
-  
-  remove(selling) {
-    return this.api.remove(`${this.endpoint}/${selling._id}`);
+
+  remove(selling, shouldUpdateQuantity: boolean) {
+    let params: URLSearchParams = new URLSearchParams();
+    params.set('shouldUpdateQuantity', String(shouldUpdateQuantity));
+    let requestOptions = new RequestOptions({ search: params });
+
+    return this.api.remove(`${this.endpoint}/${selling._id}`, requestOptions);
   }
 }

@@ -9,6 +9,17 @@
     <ion-content class="outer-content">
       <ion-list>
         <ion-list-header>
+          Negocio
+        </ion-list-header>
+        <button ion-item menuClose (click)="onViewChange('inventory')">
+          <ion-icon item-start name="apps"></ion-icon>
+          Inventario
+        </button>
+        <button ion-item menuClose (click)="onViewChange('sellings')">
+          <ion-icon item-start name="calculator"></ion-icon>
+          Ventas
+        </button>
+        <ion-list-header>
           Usuario
         </ion-list-header>
         <button ion-item menuClose (click)="onLogout()">

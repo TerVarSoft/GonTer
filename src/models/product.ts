@@ -1,3 +1,5 @@
+import { ProductPrice } from "./product-price";
+
 /**
  * Product model.
  */
@@ -9,7 +11,13 @@ export class Product {
 
   category: string;
 
+  description: string;
+
   properties: any;  
+
+  prices: ProductPrice[];
+
+  buyingUnitPrice: number;
 
   locations: any[];
 

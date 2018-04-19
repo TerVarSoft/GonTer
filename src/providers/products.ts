@@ -2,6 +2,7 @@ import { RequestOptions, URLSearchParams  } from '@angular/http';
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 
+import * as _ from "lodash";
 
 import { TunariApi } from './tunari-api';
 import { TunariStorage } from './tunari-storage';
@@ -20,15 +21,14 @@ export class Products {
 
   get(query: string, page: number = 1) {
     let params: URLSearchParams = new URLSearchParams();
-    let commonTags = "Invitaciones ";
-    params.set('tags', commonTags + query); 
+    params.set('tags', query); 
     params.set('page', page.toString()); 
     let requestOptions = new RequestOptions({search: params});
 
     return this.api.get(this.endpoint, requestOptions);
   }
 
-  save(product) {    
+  save(product) {
     if(product._id) {
       return this.put(product);
     } else {
@@ -48,18 +48,23 @@ export class Products {
     return this.api.remove(`${this.endpoint}/${product._id}`);
   }
 
-  getFavorites() {
-    return this.storage.getProductFavorites();
+  getFavorites(productCategory) {
+    return this.storage.getProductFavorites().then(favoritesObject => {
+      return favoritesObject ? 
+        _.filter(favoritesObject.items, favorite => favorite.category === productCategory) :
+        null;
+    });
   }
   
-  loadFavoritesFromServer() {        
+  loadFavoritesFromServer(productCategory) {
     let params: URLSearchParams = new URLSearchParams();
     params.set('isFavorite', "true"); 
-    let requestOptions = new RequestOptions({search: params});        
+    let requestOptions = new RequestOptions({search: params});
 
     return this.api.get(this.endpoint, requestOptions)
-      .map(productsObject => {
+      .map(productsObject => {        
         this.storage.setProductFavorites(productsObject);
+        productsObject.items = _.filter(productsObject.items, favorite => favorite.category === productCategory);
         return productsObject;
       });
   }

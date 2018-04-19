@@ -1,16 +1,18 @@
 import { Component } from '@angular/core';
 import { NavParams, AlertController, NavController } from 'ionic-angular';
 
-
 import { Products } from '../../../providers/products';
+import { ProductsUtil } from './../products-util';
 import { TunariNotifier } from '../../../providers/tunari-notifier';
 import { SettingsCache } from '../../../providers/settings-cache';
 
 import { Product } from '../../../models/product';
+import { ProductPrice } from '../../../models/product-price';
 
 @Component({
   selector: 'product-update',
   templateUrl: 'product-update.html',
+  providers: [ProductsUtil]
 })
 export class ProductUpdatePage {
 
@@ -26,9 +28,12 @@ export class ProductUpdatePage {
 
   invitationTypes: string[];
 
+  priceTypes: any[]
+
   constructor(public navParams: NavParams,
     private alertCtrl: AlertController,
     public navCtrl: NavController,
+    public util: ProductsUtil,
     public productsProvider: Products,
     public notifier: TunariNotifier,
     private settingsProvider: SettingsCache) {
@@ -36,15 +41,45 @@ export class ProductUpdatePage {
 
     this.categories = settingsProvider.getProductCategories();
     this.invitationTypes = settingsProvider.getInvitationTypes();
-
     this.product.category = this.product.category || this.categories[0].name;
+
     this.product.properties = this.product.properties || {};
-    this.product.properties.type = this.product.properties.type || this.invitationTypes[0];
     this.product.tags = this.product.tags || [];
-    this.product.properties = this.product.properties || {type: "", size: "", genre: ""};
     this.product.locations = this.product.locations || [];
 
+    this.initCategory();
+  }
+
+  public initCategory() {
     this.isInvitation = this.product.category == this.INVITATION_TYPE;
+    this.initProperties();
+    this.initProductPrices();
+  }
+
+  public initProperties() {
+    this.product.properties = this.isInvitation ?
+      (this.product.properties || { type: "", size: "", genre: "" }) :
+      {};
+
+    this.product.properties.type = this.isInvitation ?
+      (this.product.properties.type || this.invitationTypes[0]) :
+      null;
+  }
+
+  public initProductPrices() {
+    // Init product prices
+    this.priceTypes = this.util.getPriceTypes(this.product.category);
+    this.product.prices = this.product.prices || [];
+    this.product.prices = this.priceTypes.map(priceType => {
+      let productPrice: ProductPrice = {
+        type: priceType.id,
+        value: this.product.prices[priceType.id] ?
+          this.product.prices[priceType.id].value :
+          undefined
+      };
+
+      return productPrice;
+    })
   }
 
   addTag() {
@@ -75,6 +110,7 @@ export class ProductUpdatePage {
   save() {
     let createProductLoader = this.notifier.createLoader(`Guardando producto ${this.product.name}`);
     this.productsProvider.save(this.product).subscribe(() => {
+      this.updateFavoritesInBackground();
       this.navCtrl.pop();
       createProductLoader.dismiss();
     });
@@ -122,5 +158,13 @@ export class ProductUpdatePage {
 
   removeLocation(locationToRemove) {
     this.product.locations = this.product.locations.filter(location => location !== locationToRemove);
+  }
+
+  private updateFavoritesInBackground() {
+    console.log("Updating product favorites in background");
+    // Just update, no need to retrieve the favorites so sending ""
+    // to this method
+    this.productsProvider.loadFavoritesFromServer("")
+      .subscribe();
   }
 }

@@ -3,10 +3,13 @@ import { Platform, NavController } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Network } from "@ionic-native/network";
+import { Events } from 'ionic-angular';
 
 import * as moment from 'moment';
 
 import { LoginPage } from '../pages/login/login';
+import { ProductsTabsPage } from '../pages/products-tabs/products-tabs';
+import { ProductsSellingsPage } from '../pages/products-sellings/products-sellings';
 
 import { Connection } from '../providers/connection';
 import { TunariMessages } from '../providers/tunari-messages';
@@ -17,20 +20,21 @@ import { TunariStorage } from '../providers/tunari-storage';
   templateUrl: 'app.html',
 })
 export class GrafTunariApp {
-  
+
   @ViewChild('rootNavController') navCtrl: NavController;
 
-  rootPage:any = LoginPage;
+  rootPage: any = LoginPage;
 
   constructor(
-    public platform: Platform, 
+    public platform: Platform,
     statusBar: StatusBar,
-    public network: Network, 
-    splashScreen: SplashScreen,    
+    public network: Network,
+    splashScreen: SplashScreen,
     public storage: TunariStorage,
     public messages: TunariMessages,
     public notifier: TunariNotifier,
-    public connection: Connection
+    public connection: Connection,
+    public events: Events
   ) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
@@ -48,11 +52,30 @@ export class GrafTunariApp {
         this.notifier.createToast(this.messages.connectedToInternet);
       });
 
-      if(!connection.isConnected()) {
+      if (!connection.isConnected()) {
         this.notifier.createToast(this.messages.noInternetError);
       }
+
+      this.events.subscribe('user:logout', () => {
+        this.onLogout();
+      });
     });
   }
+
+  onViewChange(view) {
+    switch (view) {
+      case "inventory":
+        this.navCtrl.setRoot(ProductsTabsPage);
+        break;
+      case "sellings":
+        this.navCtrl.setRoot(ProductsSellingsPage);
+        break;
+      default:
+        this.navCtrl.setRoot(ProductsTabsPage);
+    }
+  }
+
+
 
   onLogout() {
     this.storage.removeStorage();

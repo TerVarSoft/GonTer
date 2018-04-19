@@ -5,9 +5,12 @@ import { ProductUpdatePage } from '../product-update/product-update';
 
 import { Product } from '../../../models/product';
 
+import { ProductsUtil } from './../products-util';
+
 @Component({
   selector: 'product-detail',
   templateUrl: 'product-detail.html',
+  providers: [ProductsUtil]
 })
 export class ProductDetailPage {
 
@@ -15,8 +18,11 @@ export class ProductDetailPage {
 
   product: Product;
 
-  constructor(public navParams: NavParams, public navCtrl: NavController) {
+  priceTypes: any[];
+
+  constructor(public navParams: NavParams, public navCtrl: NavController, public util: ProductsUtil) {
     this.product = this.navParams.data.product;
+    this.priceTypes = this.util.getPriceTypes(this.product.category);
   }
 
   editProduct() {

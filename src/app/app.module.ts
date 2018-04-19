@@ -15,6 +15,7 @@ import { ProductDetailPage } from '../pages/products/product-detail/product-deta
 import { ProductUpdatePage } from '../pages/products/product-update/product-update';
 import { ProductPreviewPage } from '../pages/products/product-preview/product-preview';
 import { ProductsSellingsPage } from '../pages/products-sellings/products-sellings';
+import { ProductSellingUpdatePage } from '../pages/products-sellings/product-selling-update/product-selling-update';
 import { ProductsWarehousePage } from '../pages/products-warehouse/products-warehouse';
 import { LoginPage } from '../pages/login/login';
 import { ProductImgComponent } from '../pages/products/product-img/product-img.component';
@@ -60,6 +61,7 @@ export function providers() {
     ProductUpdatePage,
     ProductPreviewPage,
     ProductsSellingsPage,
+    ProductSellingUpdatePage,
     ProductsWarehousePage,
     LoginPage,
     ProductImgComponent,
@@ -80,6 +82,7 @@ export function providers() {
     ProductUpdatePage,
     ProductPreviewPage,
     ProductsSellingsPage,
+    ProductSellingUpdatePage,
     ProductsWarehousePage,
     LoginPage
   ],

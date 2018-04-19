@@ -12,31 +12,20 @@ export class SettingsCache {
 
   settings: any;
 
-  priceTypes: Map<string, string> = new Map();
-
   constructor(public settingsProvider: Settings, 
     public storage: TunariStorage) {
-      this.buildPriceTypes();
   }
 
   getImgServerUrl() : string {
     return this.settings.filter(setting => setting.key === 'imgServer')[0].value;
   }
 
-  getProductCategories() : string[] {    
+  getProductCategories() : any[] {    
     return this.settings.filter(setting => setting.key === 'productCategories')[0].value;
   }
 
   getInvitationTypes() : string[] {    
     return this.settings.filter(setting => setting.key === 'invitationTypes')[0].value;
-  } 
-
-  getPriceTypes() : Map<string, string> {    
-    return this.priceTypes;
-  }
-
-  getPriceTypeText(key: string) : string {    
-    return this.priceTypes.get(key);
   } 
 
   loadFromStorage() {    
@@ -59,12 +48,5 @@ export class SettingsCache {
 
   setSettings(settings: any) {
     this.settings = settings;    
-  }
-
-  private buildPriceTypes() {
-    this.priceTypes.set("clientUnitPrice", "Unidad Imprenta"); 
-    this.priceTypes.set("clientPackagePrice", "Paquete Imprenta"); 
-    this.priceTypes.set("publicUnitPrice", "Unidad Publico"); 
-    this.priceTypes.set("publicPackagePrice", "Paquete Publico");
   }
 }

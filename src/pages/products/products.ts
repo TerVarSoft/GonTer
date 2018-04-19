@@ -1,6 +1,6 @@
 import { Component, ElementRef, Renderer } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { NavController, ActionSheetController, Platform, Alert, FabContainer } from 'ionic-angular';
+import { NavController, NavParams, ActionSheetController, Platform, Alert, FabContainer } from 'ionic-angular';
 import { Keyboard } from '@ionic-native/keyboard';
 import 'rxjs/add/observable/from';
 import "rxjs/add/operator/debounceTime";
@@ -9,6 +9,7 @@ import "rxjs/add/operator/switchMap";
 
 import { ProductDetailPage } from './product-detail/product-detail';
 import { ProductUpdatePage } from './product-update/product-update';
+import { ProductSellingUpdatePage } from './../products-sellings/product-selling-update/product-selling-update'
 
 import { Connection } from '../../providers/connection';
 import { Products } from '../../providers/products';
@@ -33,7 +34,7 @@ export class ProductsPage {
 
   private page: number = 0;
 
-  private selectedPrice: string;
+  private selectedPrice: number = 0;
 
   private selectedPriceText: string;
 
@@ -48,7 +49,8 @@ export class ProductsPage {
     public util: ProductsUtil,
     public notifier: TunariNotifier,
     public messages: TunariMessages,
-    public connection: Connection) {
+    public connection: Connection,
+    public params: NavParams) {
 
     this.setDefaultValues();
     this.setupKeyboard();
@@ -63,15 +65,16 @@ export class ProductsPage {
     if (this.page > 0 && this.connection.isConnected()) {
       this.page++;
       console.log('Pulling page ' + this.page + '...');
-      this.productsProvider.get(this.searchQuery.value, this.page)
+      const queryString = `${this.params.data.productCategory} ${this.searchQuery.value}`;
+      this.productsProvider.get(queryString, this.page)
         .map(productsObject => productsObject.items)
         .subscribe(
-        products => this.products.push(...products),
-        null,
-        () => {
-          infiniteScroll.complete();
-          console.log('Finished pulling page successfully');
-        });
+          products => this.products.push(...products),
+          null,
+          () => {
+            infiniteScroll.complete();
+            console.log('Finished pulling page successfully');
+          });
     } else {
       infiniteScroll.complete();
     }
@@ -85,13 +88,13 @@ export class ProductsPage {
 
   selectPriceToShow(fab: FabContainer) {
     fab.close();
-    let alert: Alert = this.util.getSelectPriceAlert(this.selectedPrice);
+    let alert: Alert = this.util.getSelectPriceAlert(this.params.data.productCategory, this.selectedPrice);
 
     alert.addButton({
       text: 'OK',
       handler: key => {
         this.selectedPrice = key;
-        this.selectedPriceText = this.util.getSelectedPriceText(key);
+        this.selectedPriceText = this.util.getSelectedPriceText(this.params.data.productCategory, key);
       }
     });
     alert.present();
@@ -120,7 +123,7 @@ export class ProductsPage {
       text: 'Guardar',
       handler: data => {
         let saveProductLoader = this.notifier.createLoader(`Salvando ${product.name}`);
-        product[this.selectedPrice] = data.price;
+        product.prices[this.selectedPrice].value = data.price;
         this.productsProvider.put(product).subscribe(() => {
           saveProductLoader.dismiss();
 
@@ -159,31 +162,10 @@ export class ProductsPage {
   createSelling(event, product: Product) {
     event.stopPropagation();
 
-    let alert: Alert = this.util.getCreateSellingAlert(product);
-    alert.addButton({
-      text: 'Guardar',
-      handler: data => {
-        let saveProductLoader = this.notifier.createLoader(`Salvando Venta: ${product.name}`);
-        
-        let newSelling = new Selling();
-        newSelling.productName = product.name;
-        newSelling.productType = product.properties.type;
-        newSelling.quantity = data.quantity;
-        
-        this.sellingsProvider.save(newSelling).subscribe(() => {
-          saveProductLoader.dismiss();
-
-          if (product.isFavorite && product.quantity) {
-            product.quantity -= data.quantity;
-            product.quantity = product.quantity < 0 ? 0 : product.quantity;
-
-            this.updateFavoritesInBackground();
-          }
-        });
-      }
+    this.navCtrl.push(ProductSellingUpdatePage, {
+      selling: {},
+      product: product
     });
-
-    alert.present();
   }
 
   openProductOptions(event, product) {
@@ -224,9 +206,9 @@ export class ProductsPage {
   /** Private functions */
 
   private setDefaultValues() {
-    this.selectedPrice = "clientPackagePrice";
+    this.selectedPrice = 0;
     this.selectedPriceText
-      = this.util.getSelectedPriceText(this.selectedPrice);
+      = this.util.getSelectedPriceText(this.params.data.productCategory, this.selectedPrice);
   }
 
   private setupKeyboard() {
@@ -262,34 +244,37 @@ export class ProductsPage {
 
   private initFavorites() {
     this.page = 0;
-    this.productsProvider.getFavorites().then(productsObject => {
-      if (productsObject) {
-        console.log("Favorites pulled from storage...");
-        this.products = productsObject.items;
-        this.updateFavoritesInBackground();
-      } else {
-        console.log("Favorites pulled from the server...");
-        let loader = this.notifier.createLoader("Cargando Novedades");
-        this.productsProvider.loadFavoritesFromServer()
-          .map(productsObject => productsObject.items)
-          .subscribe(products => {
-            this.products = products
-            loader.dismiss();
-          });
-      }
-    });
+    this.productsProvider.getFavorites(this.params.data.productCategory)
+      .then(cachedFavorites => {
+        if (cachedFavorites && cachedFavorites.length > 0) {
+          console.log("Favorites pulled from storage...");
+          this.products = cachedFavorites;
+          this.updateFavoritesInBackground();
+        } else {
+          console.log("Favorites pulled from the server...");
+          let loader = this.notifier.createLoader("Cargando Novedades");
+          this.productsProvider.loadFavoritesFromServer(this.params.data.productCategory)
+            .map(productsObject => productsObject.items)
+            .subscribe(products => {
+              this.products = products
+              loader.dismiss();
+            });
+        }
+      });
   }
 
   private updateFavoritesInBackground() {
-    // Update storage in backgroun with server response.
+    // Update storage in background with server response.
     console.log("Updating product favorites in background");
-    this.productsProvider.loadFavoritesFromServer().subscribe();
+    this.productsProvider.loadFavoritesFromServer(this.params.data.productCategory)
+      .subscribe();
   }
 
   private initSearchQuery() {
     this.searchQuery.valueChanges
       .filter(query => query)
       .filter(query => this.connection.isConnected())
+      .map(query => `${this.params.data.productCategory} ${query}`)
       .debounceTime(100)
       .distinctUntilChanged()
       .switchMap(query => this.productsProvider.get(query))

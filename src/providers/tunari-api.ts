@@ -2,9 +2,12 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Injectable } from '@angular/core';
 import { Http, Headers, ResponseContentType, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import { Events } from 'ionic-angular';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
 
 import { TunariStorage } from './tunari-storage';
 
@@ -14,14 +17,16 @@ import { TunariStorage } from './tunari-storage';
 @Injectable()
 export class TunariApi {
 
-  baseUrl: string = 'https://tunariserver.herokuapp.com/api/';  
+  baseUrl: string = 'https://tunariserver.herokuapp.com/api/';
+
+  // baseUrl: string = 'http://localhost:8000/api/';  
 
   authKey: string = 'authorization';
 
   headers: Headers;
 
   constructor(public http: Http, public storage: TunariStorage,
-    public sanitizer: DomSanitizer) {
+    public sanitizer: DomSanitizer, public events: Events) {
     this.headers = new Headers({ 'Content-Type': 'application/json' });
   }
 
@@ -35,7 +40,7 @@ export class TunariApi {
       }
 
       return this.http.get(url, requestOptions)
-        .map(resp => resp.json().data);
+        .map(resp => resp.json().data).catch(this.catchErrors());
     });
   }
 
@@ -70,9 +75,8 @@ export class TunariApi {
     });
   }
 
-  remove(endpoint: string) {
+  remove(endpoint: string, requestOptions: RequestOptions = new RequestOptions()) {
     let url = this.baseUrl + endpoint;
-    let requestOptions = new RequestOptions();
     requestOptions.headers = new Headers(this.headers);
 
     return this.getApiToken().flatMap(token => {
@@ -99,4 +103,19 @@ export class TunariApi {
   private getApiToken(): Observable<Headers> {
     return Observable.fromPromise(this.storage.getAuthtoken());
   }
+
+  private catchErrors() {
+
+    return (res: Response) => {
+
+      if (res.status === 401 || res.status === 403) {        
+        console.log("Invalid or expired token. Redirecting to login");
+
+        //localStorage.removeItem("token");
+        this.events.publish('user:logout');
+      }
+      return Observable.throw(res);
+    };
+  }
+
 }

@@ -9,45 +9,45 @@ import { Product } from '../../models/product';
  * Utility class for products endpoint provider. 
  */
 @Injectable()
-export class ProductsUtil {  
-
-  packageKey: string = "Paquete";
+export class ProductsUtil {
 
   constructor(public alertCtrl: AlertController,
-    private settingsProvider: SettingsCache) {}
+    private settingsProvider: SettingsCache) { }
+  
+  /* *Get Alert helper methods */
 
-  getSelectPriceAlert(selectedPrice: string): Alert {
+  getSelectPriceAlert(selectedProductCategory: string, selectedPrice: number): Alert {
+    let productCategory =
+      this.settingsProvider.getProductCategories().filter(category => category.name == selectedProductCategory)[0];
+
     let alert = this.alertCtrl.create();
 
     alert.setTitle('Precio');
 
-    const priceTypes: Map<string, string> = 
-      this.settingsProvider.getPriceTypes();
-      
-    priceTypes.forEach((priceTypeValue, priceTypeKey) =>  {
+    productCategory.priceTypes.forEach(priceType => {
       alert.addInput({
         type: 'radio',
-        label: priceTypeValue,
-        value: priceTypeKey,
-        checked: selectedPrice === priceTypeKey
+        label: priceType.name,
+        value: priceType.id,
+        checked: selectedPrice === priceType.id
       });
-    });    
+    });
 
     alert.addButton('Cancel');
 
     return alert;
   }
 
-  getAddPriceAlert(product: Product, selectedPriceType: string) {
+  getAddPriceAlert(product: Product, selectedPriceType: number) {
     let alert = this.alertCtrl.create({
       title: product.name,
-      message: this.getSelectedPriceText(selectedPriceType),
+      message: this.getSelectedPriceText(product.category, selectedPriceType),
       inputs: [
         {
           name: 'price',
           type: 'number',
           placeholder: 'Agrega un precio!',
-          value: "" + product[selectedPriceType]
+          value: "" + product.prices[selectedPriceType].value
         },
       ],
       buttons: [
@@ -56,7 +56,7 @@ export class ProductsUtil {
         }
       ]
     });
-    
+
     return alert;
   }
 
@@ -78,13 +78,13 @@ export class ProductsUtil {
         }
       ]
     });
-        
+
     return alert;
   }
 
   getCreateSellingAlert(product: Product) {
     let alert = this.alertCtrl.create({
-      title: "Nueva Venta" ,
+      title: "Nueva Venta",
       message: product.name,
       inputs: [
         {
@@ -99,7 +99,7 @@ export class ProductsUtil {
         }
       ]
     });
-        
+
     return alert;
   }
 
@@ -117,7 +117,22 @@ export class ProductsUtil {
     return alert;
   }
 
-  getSelectedPriceText(key): string {    
-    return this.settingsProvider.getPriceTypeText(key);
+  getPriceTypes(selectedProductCategory: string): any[] {
+    let productCategory =
+      this.settingsProvider
+      .getProductCategories()
+      .filter(category => category.name == selectedProductCategory)[0];
+ 
+    return productCategory.priceTypes;
+  }
+
+  getSelectedPriceText(selectedCategory: string, priceTypeId: number): string {
+    let priceName =
+      this.settingsProvider
+      .getProductCategories()
+      .filter(category => category.name == selectedCategory)[0]
+      .priceTypes[priceTypeId]
+      .name;
+    return priceName;
   }
 }
