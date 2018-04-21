@@ -21,6 +21,8 @@ export class TunariApi {
 
   // baseUrl: string = 'http://localhost:8000/api/';  
 
+  // baseUrl: string = 'http://192.168.1.38:8000/api/';
+
   authKey: string = 'authorization';
 
   headers: Headers;
@@ -108,7 +110,7 @@ export class TunariApi {
 
     return (res: Response) => {
 
-      if (res.status === 401 || res.status === 403) {        
+      if (res.status === 401 || res.status === 403) {
         console.log("Invalid or expired token. Redirecting to login");
 
         //localStorage.removeItem("token");

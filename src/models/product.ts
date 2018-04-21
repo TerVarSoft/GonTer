@@ -15,6 +15,8 @@ export class Product {
 
   properties: any;  
 
+  imageData: string;
+
   prices: ProductPrice[];
 
   buyingUnitPrice: number;

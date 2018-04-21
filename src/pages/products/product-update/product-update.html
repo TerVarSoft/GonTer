@@ -11,6 +11,20 @@
 </ion-header>
 
 <ion-content>
+
+  <div class="product-profile" text-center>
+    <img [src]="(loadedImageData || product.thumbnailUrl) | safeUrl" style="max-height: 100px;" />
+    <ion-fab class="gallery-button">
+      <button (click)="pickPicture()" color="secondary" ion-fab mini>
+        <ion-icon name="image"></ion-icon>
+      </button>
+    </ion-fab>
+    <ion-fab class="camera-button">
+      <button (click)="takePicture()" color="secondary" ion-fab mini>
+        <ion-icon name="camera"></ion-icon>
+      </button>
+    </ion-fab>
+  </div>
   <ion-segment [(ngModel)]="segment" color="secondary">
     <ion-segment-button value="general">
       General

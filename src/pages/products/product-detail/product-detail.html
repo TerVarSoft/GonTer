@@ -12,7 +12,7 @@
 
 <ion-content>
   <div class="product-profile" text-center>
-    <img [src]="product.thumbnailUrl | safeUrl" style="max-height: 100px;" />
+    <img [src]="(product.imageData || product.thumbnailUrl) | safeUrl" style="max-height: 100px;" />
   </div>
 
   <ion-segment [(ngModel)]="segment" color="secondary">

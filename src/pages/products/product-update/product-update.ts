@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Camera } from 'ionic-native';
 import { NavParams, AlertController, NavController } from 'ionic-angular';
 
 import { Products } from '../../../providers/products';
@@ -19,6 +20,8 @@ export class ProductUpdatePage {
   private INVITATION_TYPE: string = 'Invitaciones';
 
   segment = 'general';
+
+ loadedImageData: string;
 
   isInvitation: boolean;
 
@@ -107,7 +110,33 @@ export class ProductUpdatePage {
     addTagAlert.present();
   }
 
+  pickPicture() {
+    Camera.getPicture({
+      destinationType: Camera.DestinationType.DATA_URL,
+      sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
+      targetWidth: 1000,
+      targetHeight: 1000
+    }).then((imageData) => {
+      this.loadedImageData = "data:image/jpeg;base64," + imageData;
+    }, (err) => {
+      console.log(err);
+    });
+  }
+
+  takePicture() {
+    Camera.getPicture({
+      destinationType: Camera.DestinationType.DATA_URL,
+      targetWidth: 1000,
+      targetHeight: 1000
+    }).then((imageData) => {
+      this.loadedImageData = "data:image/jpeg;base64," + imageData;
+    }, (err) => {
+      console.log(err);
+    });
+  }
+
   save() {
+    this.product.imageData = this.loadedImageData;
     let createProductLoader = this.notifier.createLoader(`Guardando producto ${this.product.name}`);
     this.productsProvider.save(this.product).subscribe(() => {
       this.updateFavoritesInBackground();
