@@ -10,10 +10,9 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content>
-
+<ion-content>  
   <div class="product-profile" text-center>
-    <img [src]="(loadedImageData || product.thumbnailUrl) | safeUrl" style="max-height: 100px;" />
+    <img *ngIf="(loadedImageData || product.thumbnailUrl)" [src]="(loadedImageData || product.thumbnailUrl) | safeUrl" style="max-height: 100px;" />
     <ion-fab class="gallery-button">
       <button (click)="pickPicture()" color="secondary" ion-fab mini>
         <ion-icon name="image"></ion-icon>
