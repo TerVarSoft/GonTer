@@ -112,8 +112,7 @@ export class TunariApi {
 
       if (res.status === 401 || res.status === 403) {
         console.log("Invalid or expired token. Redirecting to login");
-
-        //localStorage.removeItem("token");
+        
         this.events.publish('user:logout');
       }
       return Observable.throw(res);
