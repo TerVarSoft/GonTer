@@ -10,7 +10,7 @@
 </ion-header>
 
 <ion-content>
-    <ion-item>
+    <!-- <ion-item>
         <ion-label>Date</ion-label>
         <ion-datetime displayFormat="MMM/DD/YYYY" monthNames="enero, febrero, marzo, abril, mayo, junio, agosto, septiembre, octubre, noviembre, diciembre"
             monthShortNames="ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, di"
@@ -19,12 +19,12 @@
             <ion-icon name="close"></ion-icon>
         </button>
 
-    </ion-item>
+    </ion-item> -->
     <ion-item-group *ngFor="let oneDaySellings of groupedSellings">
         <ion-item-divider color="light">{{oneDaySellings.day}}</ion-item-divider>
         <ion-item *ngFor="let selling of oneDaySellings.sellings" (click)="editSelling(selling)">
-            <h2 class="text-color">{{selling.productName}}</h2>
-            <p class="text-color">{{selling.quantity}} Unidades</p>
+            <h2 class="text-color">{{selling.details}}</h2>
+            <p class="text-color">{{selling.total}} Bs</p>
             <ion-note item-end>{{selling.time}}</ion-note>
         </ion-item>
     </ion-item-group>

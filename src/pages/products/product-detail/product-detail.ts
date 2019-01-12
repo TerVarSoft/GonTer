@@ -6,6 +6,7 @@ import { ProductUpdatePage } from '../product-update/product-update';
 import { Product } from '../../../models/product';
 
 import { ProductsUtil } from './../products-util';
+import { SettingsCache } from '../../../providers/settings-cache';
 
 @Component({
   selector: 'product-detail',
@@ -18,11 +19,25 @@ export class ProductDetailPage {
 
   product: Product;
 
-  priceTypes: any[];
+  productPrices: any[];
 
-  constructor(public navParams: NavParams, public navCtrl: NavController, public util: ProductsUtil) {
+  constructor(public navParams: NavParams,
+    public navCtrl: NavController,
+    public settingsProvider: SettingsCache) {
     this.product = this.navParams.data.product;
-    this.priceTypes = this.util.getPriceTypes(this.product.category);
+    this.productPrices = this.settingsProvider.getProductPrices(
+      this.product.categoryId, this.product.typeId);
+
+    const newPrices = this.productPrices.map(priceType => {
+      const productPrice = this.product.prices.find(price => price.priceId === priceType.id);
+      return {
+        priceId: priceType.id,
+        name: priceType.name,
+        value: productPrice ? productPrice.value : 0
+      }
+    });
+
+    this.product.prices = newPrices;
   }
 
   editProduct() {

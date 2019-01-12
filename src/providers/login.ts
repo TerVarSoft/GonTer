@@ -11,10 +11,10 @@ export class Login {
 
   baseUrl: string;
 
-  endpoint: string = "login";
+  endpoint: string = "auth";
 
   constructor(public api: TunariApi) {
-    this.baseUrl = this.api.baseUrl + "/login";
+    this.baseUrl = this.api.baseUrl;
   }
 
   post(userName: string, password: string) {    

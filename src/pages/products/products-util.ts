@@ -13,7 +13,7 @@ export class ProductsUtil {
 
   constructor(public alertCtrl: AlertController,
     private settingsProvider: SettingsCache) { }
-  
+
   /* *Get Alert helper methods */
 
   getSelectPriceAlert(selectedProductCategory: string, selectedPrice: number): Alert {
@@ -38,16 +38,19 @@ export class ProductsUtil {
     return alert;
   }
 
-  getAddPriceAlert(product: Product, selectedPriceType: number) {
+  getAddPriceAlert(product: Product, selectedPriceType: any) {
+
+    const priceToUpdate = product.prices.find(price => price.priceId === selectedPriceType.id);
+
     let alert = this.alertCtrl.create({
       title: product.name,
-      message: this.getSelectedPriceText(product.category, selectedPriceType),
+      message: selectedPriceType.name,
       inputs: [
         {
           name: 'price',
           type: 'number',
           placeholder: 'Agrega un precio!',
-          value: "" + product.prices[selectedPriceType].value
+          value: "" + (priceToUpdate ? priceToUpdate.value : "")
         },
       ],
       buttons: [
@@ -82,10 +85,11 @@ export class ProductsUtil {
     return alert;
   }
 
-  getCreateSellingAlert(product: Product) {
+  getCreateSellingAlert(product: Product, selectedPriceId: string) {
+    const selectedPrice = product.prices.find(price => price.priceId === selectedPriceId);
     let alert = this.alertCtrl.create({
-      title: "Nueva Venta",
-      message: product.name,
+      title: `Venta ${product.name}`,
+      message: `${selectedPrice.name}: ${selectedPrice.value} Bs.`,
       inputs: [
         {
           name: 'quantity',
@@ -117,22 +121,96 @@ export class ProductsUtil {
     return alert;
   }
 
+  getProductCategoriesAlert(selectedCategory: any) {
+    const categoryInputs = this.settingsProvider.getProductCategoriesWithAll()
+      .map(category => ({
+        label: category.name,
+        value: category,
+        type: 'radio',
+        checked: selectedCategory.id === category.id
+      }));
+
+    let alert = this.alertCtrl.create({
+      title: 'Categorias',
+      message: 'Selecciona una categoria',
+      inputs: categoryInputs,
+      buttons: [
+        {
+          text: 'Cancel'
+        }
+      ]
+    });
+
+    return alert;
+  }
+
+  getProductTypesAlert(selectedCategory: any, selectedType: any) {
+    console.log('')
+    const typeInputs = this.settingsProvider.getProductTypesWithAll(selectedCategory.id)
+      .map(type => ({
+        label: type.name,
+        value: type,
+        type: 'radio',
+        checked: selectedType.id === type.id
+      }));
+
+    let alert = this.alertCtrl.create({
+      title: 'Tipos',
+      message: 'Selecciona un tipo',
+      inputs: typeInputs,
+      buttons: [
+        {
+          text: 'Cancel'
+        }
+      ]
+    });
+
+    return alert;
+  }
+
+  getProductPricesAlert(selectedCategory: any, selectedType: any, selectedPrice: any) {
+    console.log('')
+    const priceInputs = this.settingsProvider.getProductPrices(selectedCategory.id, selectedType.id)
+      .map(price => ({
+        label: price.name,
+        value: price,
+        type: 'radio',
+        checked: selectedPrice.id === price.id
+      }));
+
+    let alert = this.alertCtrl.create({
+      title: 'Tipos',
+      message: 'Selecciona un tipo',
+      inputs: priceInputs,
+      buttons: [
+        {
+          text: 'Cancel'
+        }
+      ]
+    });
+
+    return alert;
+  }
+
   getPriceTypes(selectedProductCategory: string): any[] {
-    let productCategory =
-      this.settingsProvider
-      .getProductCategories()
-      .filter(category => category.name == selectedProductCategory)[0];
- 
-    return productCategory.priceTypes;
+    // let productCategory =
+    //   this.settingsProvider
+    //   .getProductCategories()
+    //   .filter(category => category.name == selectedProductCategory)[0];
+
+    return [{}];
+    // return productCategory.priceTypes;
   }
 
   getSelectedPriceText(selectedCategory: string, priceTypeId: number): string {
-    let priceName =
-      this.settingsProvider
-      .getProductCategories()
-      .filter(category => category.name == selectedCategory)[0]
-      .priceTypes[priceTypeId]
-      .name;
-    return priceName;
+    // let priceName =
+    //   this.settingsProvider
+    //   .getProductCategories()
+    //   .filter(category => category.name == selectedCategory)[0]
+    //   .priceTypes[priceTypeId]
+    //   .name;
+
+    return '';
+    // return priceName;
   }
 }

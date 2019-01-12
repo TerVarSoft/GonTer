@@ -26,7 +26,7 @@ export class ProductSellingUpdatePage {
 
     product: Product;
 
-    priceIdFromOptions: number;
+    priceIdFromOptions: string;
 
     quantityForPrice: number;
 
@@ -54,7 +54,7 @@ export class ProductSellingUpdatePage {
         this.selling = this.navParams.data.selling;
         this.product = this.navParams.data.product;
         this.priceTypes = this.product ?
-            this.util.getPriceTypes(this.product.category) : null;
+            this.util.getPriceTypes(this.product.categoryId) : null;
 
         this.formPrice.valueChanges
             .subscribe(price => {
@@ -109,9 +109,9 @@ export class ProductSellingUpdatePage {
     }
 
     initSelling() {
-        this.isInvitation = this.product ? (this.product.category == this.INVITATION_TYPE) : false;
+        this.isInvitation = this.product ? (this.product.categoryId == this.INVITATION_TYPE) : false;
         this.selling.productId = this.product ?
-            this.product._id :
+            this.product.id :
             this.selling.productId;
         this.formQuantity.setValue(this.selling.quantity ||
             this.isInvitation ? 25 : 1);
@@ -123,7 +123,7 @@ export class ProductSellingUpdatePage {
             this.selling.price;
         this.selling.quantityForPrice = this.selling.quantityForPrice || this.isInvitation ? 100 : 1;
         this.priceIdFromOptions = this.product ?
-            this.product.prices[0].type :
+            this.product.prices[0].priceId :
             null;
         this.formBuyingPrice.setValue(this.product ?
             this.product.buyingUnitPrice :

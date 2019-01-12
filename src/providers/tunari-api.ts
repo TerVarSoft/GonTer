@@ -17,19 +17,20 @@ import { TunariStorage } from './tunari-storage';
 @Injectable()
 export class TunariApi {
 
-  baseUrl: string = 'https://tunariserver.herokuapp.com/api/';
+  baseUrl: string = 'https://imptunari.herokuapp.com/api/';
 
-  // baseUrl: string = 'http://localhost:8000/api/';  
-
-  // baseUrl: string = 'http://192.168.1.38:8000/api/';
+  // baseUrl: string = 'http://localhost:5000/api/';
 
   authKey: string = 'authorization';
 
   headers: Headers;
 
+  multipartHeaders: Headers;
+
   constructor(public http: Http, public storage: TunariStorage,
     public sanitizer: DomSanitizer, public events: Events) {
     this.headers = new Headers({ 'Content-Type': 'application/json' });
+    this.multipartHeaders = new Headers({});
   }
 
   get(endpoint: string, requestOptions: RequestOptions = new RequestOptions()) {
@@ -58,6 +59,32 @@ export class TunariApi {
 
       return this.http
         .post(url, body, requestOptions)
+        .map(resp => resp.json().data);
+    });
+  }
+
+  postImage(endpoint: string, imageData: any) {
+    let url = this.baseUrl + endpoint;
+    let requestOptions = new RequestOptions();
+    requestOptions.headers = new Headers(this.multipartHeaders);
+
+    return this.getApiToken().flatMap(token => {
+      if (token) {
+        requestOptions.headers.append(this.authKey, 'Bearer ' + token);
+      }
+
+      let blob = new Blob();
+      if (imageData) {
+        const binary = this.fixBinary(atob(imageData));
+        blob = new Blob([binary]);
+      }
+
+
+      let formData = new FormData();
+      formData.append('file', blob);
+
+      return this.http
+        .post(url, formData, requestOptions)
         .map(resp => resp.json().data);
     });
   }
@@ -106,13 +133,23 @@ export class TunariApi {
     return Observable.fromPromise(this.storage.getAuthtoken());
   }
 
+  private fixBinary(bin) {
+    var length = bin.length;
+    var buf = new ArrayBuffer(length);
+    var arr = new Uint8Array(buf);
+    for (var i = 0; i < length; i++) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return buf;
+  }
+
   private catchErrors() {
 
     return (res: Response) => {
 
       if (res.status === 401 || res.status === 403) {
         console.log("Invalid or expired token. Redirecting to login");
-        
+
         this.events.publish('user:logout');
       }
       return Observable.throw(res);

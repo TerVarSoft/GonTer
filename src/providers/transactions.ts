@@ -8,11 +8,11 @@ import { TunariApi } from './tunari-api';
  * Sellings endpoint provider. 
  */
 @Injectable()
-export class Sellings {
+export class Transactions {
 
   baseUrl: string;
 
-  endpoint: string = "sellings";
+  endpoint: string = "transactions";
 
   constructor(public api: TunariApi) { }
 

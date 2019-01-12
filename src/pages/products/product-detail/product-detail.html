@@ -12,7 +12,7 @@
 
 <ion-content>
   <div class="product-profile" text-center>
-    <img [src]="(product.imageData || product.thumbnailUrl) | safeUrl" style="max-height: 100px;" />
+    <product-img [product]="product" style="max-height: 100px;"></product-img>
   </div>
 
   <ion-segment [(ngModel)]="segment" color="secondary">
@@ -21,9 +21,6 @@
     </ion-segment-button>
     <ion-segment-button value="prices">
       Precios
-    </ion-segment-button>
-    <ion-segment-button value="locations">
-      Ubicaciones
     </ion-segment-button>
   </ion-segment>
 
@@ -60,12 +57,12 @@
       <ion-item-divider color="primary-50" class="text-color">
         Lista de precios de venta
       </ion-item-divider>
-      <ion-item *ngFor="let priceType of priceTypes" class="text-color">
-        <div *ngIf="product.prices[priceType.id]?.value">
-          {{product.prices[priceType.id]?.value}} Bs
+      <ion-item *ngFor="let price of product.prices" class="text-color">
+        <div *ngIf="price.value">
+          {{price.value}} Bs
         </div>
         <ion-note item-end>
-          {{priceType.name}}
+          {{price.name}}
         </ion-note>
       </ion-item>
       <ion-item-divider color="primary-50" class="text-color">
@@ -79,22 +76,6 @@
           Precio de compra unitario
         </ion-note>
       </ion-item>
-    </ion-item-group>
-
-    <ion-item-group *ngSwitchCase="'locations'">
-      <ion-item-divider color="primary-50" class="text-color">
-        Ubicaciones
-      </ion-item-divider>
-      <ion-item *ngFor="let location of product.locations" class="text-color">
-        {{location.value}}
-        <ion-note item-end>
-          {{location.type}}
-        </ion-note>
-      </ion-item>
-      <h6 *ngIf="product.locations.length <= 0" padding class="text-color-light">
-        <ion-icon name="information-circle"></ion-icon>
-        Este producto no tiene ubicaciones
-      </h6>
     </ion-item-group>
   </div>
 </ion-content>

@@ -9,7 +9,6 @@ import "rxjs/add/operator/switchMap";
 
 import { ProductDetailPage } from './product-detail/product-detail';
 import { ProductUpdatePage } from './product-update/product-update';
-import { ProductSellingUpdatePage } from './../products-sellings/product-selling-update/product-selling-update'
 
 import { Connection } from '../../providers/connection';
 import { Products } from '../../providers/products';
@@ -19,6 +18,7 @@ import { TunariMessages } from '../../providers/tunari-messages';
 import { TunariNotifier } from '../../providers/tunari-notifier';
 
 import { Product } from '../../models/product';
+import { SettingsCache } from '../../providers/settings-cache';
 
 @Component({
   selector: 'page-products',
@@ -33,9 +33,17 @@ export class ProductsPage {
 
   private page: number = 0;
 
-  private selectedPrice: number = 0;
+  private selectedCategory: any = this.settingsProvider.getProductCategoriesWithAll()[0];
 
-  private selectedPriceText: string;
+  private selectedType: any = this.settingsProvider.getProductTypesWithAll('')[0];
+
+  private selectedPrice: any = this.settingsProvider.getProductPrices('', '')[0];
+
+  private productCategories: any[];
+
+  private productTypes: any[];
+
+  private productPrices: any[];
 
   constructor(public platform: Platform,
     public navCtrl: NavController,
@@ -45,6 +53,7 @@ export class ProductsPage {
     private elRef: ElementRef,
     public productsProvider: Products,
     public sellingsProvider: Sellings,
+    public settingsProvider: SettingsCache,
     public util: ProductsUtil,
     public notifier: TunariNotifier,
     public messages: TunariMessages,
@@ -64,8 +73,13 @@ export class ProductsPage {
     if (this.page > 0 && this.connection.isConnected()) {
       this.page++;
       console.log('Pulling page ' + this.page + '...');
-      const queryString = `${this.params.data.productCategory} ${this.searchQuery.value}`;
-      this.productsProvider.get(queryString, this.page)
+      const query = {
+        tags: this.searchQuery.value,
+        categoryId: this.selectedCategory.id,
+        typeId: this.selectedType.id
+      }
+
+      this.productsProvider.get(query, this.page)
         .map(productsObject => productsObject.items)
         .subscribe(
           products => this.products.push(...products),
@@ -85,24 +99,12 @@ export class ProductsPage {
 
   /** Main Fab button functions. */
 
-  selectPriceToShow(fab: FabContainer) {
-    fab.close();
-    let alert: Alert = this.util.getSelectPriceAlert(this.params.data.productCategory, this.selectedPrice);
-
-    alert.addButton({
-      text: 'OK',
-      handler: key => {
-        this.selectedPrice = key;
-        this.selectedPriceText = this.util.getSelectedPriceText(this.params.data.productCategory, key);
-      }
-    });
-    alert.present();
-  }
-
   createProduct(fab: FabContainer) {
     fab.close();
     this.navCtrl.push(ProductUpdatePage, {
-      product: new Product()
+      product: new Product(),
+      selectedProductCategoryId: this.selectedCategory.id,
+      selectedProductTypeId: this.selectedType.id,
     });
   }
 
@@ -122,18 +124,39 @@ export class ProductsPage {
       text: 'Guardar',
       handler: data => {
         let saveProductLoader = this.notifier.createLoader(`Salvando ${product.name}`);
-        product.prices[this.selectedPrice].value = data.price;
+        const selectedPrice = product.prices.find(price => price.priceId === this.selectedPrice.id)
+
+        if (selectedPrice) {
+          selectedPrice.value = data.price;
+        } else {
+          saveProductLoader.dismiss();
+          this.notifier.createToast(this.messages.errorWhenSavingProduct);
+        }
+
         this.productsProvider.put(product).subscribe(() => {
           saveProductLoader.dismiss();
 
           if (product.isFavorite) {
             this.updateFavoritesInBackground();
           }
+        }, error => {
+          saveProductLoader.dismiss();
+          this.notifier.createToast(this.messages.errorWhenSavingProduct);
         });
       }
     });
 
     alert.present();
+  }
+
+  getSelectedProductPrice(product: Product) {
+    const selectedPrice = product.prices.find(price => price.priceId === this.selectedPrice.id);
+
+    if (selectedPrice) {
+      return `${selectedPrice.name}: ${selectedPrice.value} Bs.`;
+    }
+
+    return "";
   }
 
   setProductQuantity(event, product: Product) {
@@ -161,11 +184,33 @@ export class ProductsPage {
   createSelling(event, product: Product) {
     event.stopPropagation();
 
-    this.navCtrl.push(ProductSellingUpdatePage, {
-      selling: {},
-      product: product
+    let alert: Alert = this.util.getCreateSellingAlert(product, this.selectedPrice.id);
+    alert.addButton({
+      text: 'Guardar',
+      handler: data => {
+        let createSellingLoader = this.notifier.createLoader(`Salvando ${product.name}`);
+        product.quantity = data.quantity;
+        this.sellingsProvider.post({
+          productId: product.id,
+          quantity: data.quantity,
+          priceId: this.selectedPrice.id
+        }).subscribe(() => {
+          createSellingLoader.dismiss();
+        });
+      }
     });
+
+    alert.present();
   }
+
+  // createSelling(event, product: Product) {
+  //   event.stopPropagation();
+
+  //   this.navCtrl.push(ProductSellingUpdatePage, {
+  //     selling: {},
+  //     product: product
+  //   });
+  // }
 
   openProductOptions(event, product) {
     event.stopPropagation();
@@ -187,7 +232,9 @@ export class ProductsPage {
           icon: !this.platform.is('ios') ? 'create' : null,
           handler: () => {
             this.navCtrl.push(ProductUpdatePage, {
-              product: product
+              product: product,
+              selectedProductCategoryId: this.selectedCategory.id,
+              selectedProductTypeId: this.selectedType.id,
             });
           }
         }, {
@@ -202,12 +249,75 @@ export class ProductsPage {
     actionSheet.present();
   }
 
+  /** Product options functions */
+
+  changeCategory(event) {
+    event.stopPropagation();
+
+    let alert: Alert = this.util.getProductCategoriesAlert(this.selectedCategory);
+    alert.addButton({
+      text: 'Guardar',
+      handler: data => {
+        console.log(data);
+        this.selectedCategory = data
+
+        this.selectedType = this.productTypes[0];
+        this.productTypes = this.settingsProvider.getProductTypesWithAll(this.selectedCategory.id);
+        this.productPrices = this.settingsProvider.getProductPrices(this.selectedCategory.id, this.selectedType.id);
+
+        this.selectedPrice = this.productPrices.length > 0 ?
+          this.productPrices[0] : {};
+
+        if (this.selectedCategory.id === '') {
+          this.initFavorites();
+        } else {
+          this.searchProducts();
+        }
+
+      }
+    })
+
+    alert.present();
+  }
+
+  changeType(event) {
+    event.stopPropagation();
+
+    let alert: Alert = this.util.getProductTypesAlert(this.selectedCategory, this.selectedType);
+    alert.addButton({
+      text: 'Guardar',
+      handler: data => {
+        console.log(data);
+        this.selectedType = data
+        this.searchProducts();
+      }
+    })
+
+    alert.present();
+  }
+
+  changePrice(event) {
+    event.stopPropagation();
+
+    let alert: Alert = this.util.getProductPricesAlert(this.selectedCategory, this.selectedType, this.selectedPrice);
+    alert.addButton({
+      text: 'Guardar',
+      handler: data => {
+        console.log(data);
+        this.selectedPrice = data
+        this.searchProducts();
+      }
+    })
+
+    alert.present();
+  }
+
   /** Private functions */
 
   private setDefaultValues() {
-    this.selectedPrice = 0;
-    this.selectedPriceText
-      = this.util.getSelectedPriceText(this.params.data.productCategory, this.selectedPrice);
+    this.productCategories = this.settingsProvider.getProductCategoriesWithAll();
+    this.productTypes = this.settingsProvider.getProductTypesWithAll('');
+    this.productPrices = this.settingsProvider.getProductPrices('', '');
   }
 
   private setupKeyboard() {
@@ -233,6 +343,7 @@ export class ProductsPage {
         this.productsProvider.remove(productToDelete).subscribe(() => {
           this.products =
             this.products.filter(product => product.name !== productToDelete.name)
+          this.updateFavoritesInBackground();
           removeProductLoader.dismiss();
         });
       }
@@ -273,10 +384,13 @@ export class ProductsPage {
     this.searchQuery.valueChanges
       .filter(query => query)
       .filter(query => this.connection.isConnected())
-      .map(query => `${this.params.data.productCategory} ${query}`)
       .debounceTime(100)
       .distinctUntilChanged()
-      .switchMap(query => this.productsProvider.get(query))
+      .switchMap(query => this.productsProvider.get({
+        tags: query,
+        categoryId: this.selectedCategory.id,
+        typeId: this.selectedType.id
+      }))
       .map(productsObject => productsObject.items)
       .subscribe(products => {
         this.page = 1;
@@ -291,5 +405,23 @@ export class ProductsPage {
     this.searchQuery.valueChanges
       .filter(query => !query)
       .subscribe(() => this.initFavorites());
+  }
+
+  private searchProducts = () => {
+    const query = {
+      tags: this.searchQuery.value,
+      categoryId: this.selectedCategory.id,
+      typeId: this.selectedType.id
+    };
+
+    console.log(query);
+
+    this.productsProvider.get(query).subscribe(products => {
+      this.page = 1;
+      this.products = products.items;
+    }, null,
+      () => {
+        console.log('Finished pulling page 1 of products');
+      });
   }
 }

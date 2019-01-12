@@ -19,6 +19,8 @@ import { ProductSellingUpdatePage } from '../pages/products-sellings/product-sel
 import { ProductsWarehousePage } from '../pages/products-warehouse/products-warehouse';
 import { LoginPage } from '../pages/login/login';
 import { ProductImgComponent } from '../pages/products/product-img/product-img.component';
+import { ThumbnailImgComponent } from '../pages/products/thumbnail-img/thumbnail-img.component';
+import { LoadingImgComponent } from '../pages/products/loading-img/loading-img.component';
 import { SafeUrlPipe } from '../pipes/safe-url.pipe';
 
 import { Connection } from '../providers/connection';
@@ -27,6 +29,7 @@ import { TunariNotifier } from '../providers/tunari-notifier';
 import { TunariMessages } from '../providers/tunari-messages';
 import { Products } from '../providers/products';
 import { Sellings } from '../providers/sellings';
+import { Transactions } from '../providers/transactions';
 import { Settings } from '../providers/settings';
 import { SettingsCache } from '../providers/settings-cache';
 import { TunariApi } from '../providers/tunari-api';
@@ -40,6 +43,7 @@ export function providers() {
     Network,
     Products,
     Sellings,
+    Transactions,
     Settings,
     SettingsCache,
     SplashScreen,
@@ -65,6 +69,8 @@ export function providers() {
     ProductsWarehousePage,
     LoginPage,
     ProductImgComponent,
+    ThumbnailImgComponent,
+    LoadingImgComponent,
     SafeUrlPipe
   ],
   imports: [

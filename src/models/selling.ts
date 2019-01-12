@@ -3,7 +3,7 @@
  */
 export class Selling {
     
-      _id: string;
+      id: string;
       
       productId: string;
 

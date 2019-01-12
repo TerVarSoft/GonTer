@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { NavController } from 'ionic-angular';
 
-import { ProductsTabsPage } from '../../pages/products-tabs/products-tabs';
+import { ProductsPage } from '../../pages/products/products';
 
 import { Login } from '../../providers/login';
 import { SettingsCache } from '../../providers/settings-cache';
@@ -17,67 +17,58 @@ import { UserToken } from '../../models/user-token';
   templateUrl: 'login.html'
 })
 export class LoginPage {
-  login: {username?: string, password?: string} = {};
+  login: { username?: string, password?: string } = {};
   submitted: boolean = false;
   isLoggedIn: boolean = true;
-  
+
   constructor(public navCtrl: NavController,
     public loginService: Login,
     public settingsProvider: SettingsCache,
     public notifier: TunariNotifier,
     public storage: TunariStorage,
-    public messages: TunariMessages) { 
-      this.storage.getAuthtoken().then(token => {
-        if(!token) {
-          this.isLoggedIn = false;
-        } else {
-          this.loadConfiguration();
-        }
-      });
+    public messages: TunariMessages) {
+    this.storage.getAuthtoken().then(token => {
+      if (!token) {
+        this.isLoggedIn = false;
+      } else {
+        this.loadConfiguration();
+      }
+    });
   }
 
   onLogin(form: NgForm) {
     this.submitted = true;
 
-    if (form.valid) {  
+    if (form.valid) {
       let loader = this.notifier.createLoader(this.messages.authenticating);
       this.loginService.post(this.login.username, this.login.password)
         .subscribe(resp => {
           const userToken: UserToken = resp;
-          if(userToken.user.role === 'admin') {
-            this.storage.setAuthToken(userToken.token).then(() => {
+          if (userToken.role === 0) {
+            this.storage.setAuthToken(userToken.authToken).then(() => {
               console.log("Token Authentication has been provided by the server");
-              loader.dismiss(); 
-              this.loadConfiguration(); 
+              this.settingsProvider.setSettings(userToken.settings);
+              loader.dismiss();
+              this.navCtrl.setRoot(ProductsPage);
             });
           } else {
-            loader.dismiss(); 
+            loader.dismiss();
             this.notifier.createToast(this.messages.notAdminUser);
           }
         }, error => {
-          loader.dismiss(); 
+          loader.dismiss();
           this.notifier.createToast(this.messages.invalidUser);
         });
-    }    
+    }
   }
 
   private loadConfiguration() {
-    
+    console.log("Loading settings from storages...");
     this.settingsProvider.loadFromStorage().then(settings => {
-      if(settings) {
+      if (settings) {
         console.log("Settings loaded from local storage...");
-        this.navCtrl.setRoot(ProductsTabsPage);
-
-        console.log("Updating settings from server in background...");
-        this.settingsProvider.loadFromServer().subscribe();
-      } else {
-        let loader = this.notifier.createLoader(this.messages.loadingSettings);
-        this.settingsProvider.loadFromServer().subscribe(() => {
-          console.log("Settings loaded from the server...");
-          this.navCtrl.setRoot(ProductsTabsPage);
-          loader.dismiss();
-        });
+        this.navCtrl.setRoot(ProductsPage);
       }
     });
-  } 
+  }
 }

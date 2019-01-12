@@ -1,11 +1,17 @@
-import { User } from './user';
-
 /**
  * User Token model.
  */
 export class UserToken {
 
-  user: User;
+  userName: String;
 
-  token: string;
+  role: Number;
+
+  name: string;
+
+  lastName: string;
+
+  authToken: string;
+
+  settings: Object;
 }

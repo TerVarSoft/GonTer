@@ -3,7 +3,9 @@
  */
 export class ProductPrice {
 
-    type: number;
+    priceId: string;
+
+    name: string;
 
     value: number;
 }

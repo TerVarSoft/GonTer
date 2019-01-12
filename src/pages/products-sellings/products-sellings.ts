@@ -6,7 +6,7 @@ import { ProductSellingUpdatePage } from './product-selling-update/product-selli
 import * as _ from "lodash";
 import * as moment from 'moment';
 
-import { Sellings } from '../../providers/sellings';
+import { Transactions } from '../../providers/transactions';
 
 import { Selling } from '../../models/selling';
 
@@ -21,13 +21,14 @@ export class ProductsSellingsPage {
 
     filterDate: Date;
 
-    constructor(public sellingsProvider: Sellings,
+    constructor(public transactionsProvider: Transactions,
         public navCtrl: NavController) { }
 
     ionViewWillEnter() {
-        this.sellingsProvider.get()
-            .subscribe(sellingsObject => {
-                this.formatSellings(sellingsObject);
+        this.transactionsProvider.get()
+            .subscribe(transactionsObject => {
+                console.log(transactionsObject)
+                this.formatTransactions(transactionsObject);
             });
     }
 
@@ -39,21 +40,21 @@ export class ProductsSellingsPage {
 
     filterByDate() {
         if (this.filterDate) {
-            this.sellingsProvider.getByDate(this.filterDate)
+            this.transactionsProvider.getByDate(this.filterDate)
                 .subscribe(sellingsObject => {
-                    this.formatSellings(sellingsObject);
+                    this.formatTransactions(sellingsObject);
                 });
         } else {
-            this.sellingsProvider.get()
+            this.transactionsProvider.get()
                 .subscribe(sellingsObject => {
-                    this.formatSellings(sellingsObject);
+                    this.formatTransactions(sellingsObject);
                 });
         }
 
     }
 
-    private formatSellings(sellingsObject) {
-        this.sellings = _.orderBy(sellingsObject.items, ['createdAt'], ['desc']);
+    private formatTransactions(transactionsObject) {
+        this.sellings = _.orderBy(transactionsObject.items, ['createdAt'], ['desc']);
 
         this.groupedSellings = _.each(this.sellings, selling => selling.time = moment(selling.createdAt).format('h:mm a'));
         this.groupedSellings = _.groupBy(this.groupedSellings, selling => moment(selling.createdAt).format('dddd, Do MMMM YYYY'))

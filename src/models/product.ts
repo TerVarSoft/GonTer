@@ -5,19 +5,19 @@ import { ProductPrice } from "./product-price";
  */
 export class Product {
 
-  _id: string;
+  id: string;
 
   name: string;
 
-  category: string;
+  categoryId: string;
+
+  typeId: string;
 
   description: string;
 
-  properties: any;  
+  // imageData: string;
 
-  imageData: string;
-
-  prices: ProductPrice[];
+  prices: ProductPrice[] = [];
 
   buyingUnitPrice: number;
 
@@ -46,4 +46,17 @@ export class Product {
   quantity: number;
 
   tags: string[];
+
+  isImgUploading: boolean;
+}
+
+export const updateProductPatch = (original: Product, newData: Product) => {
+  original.id = newData.id;
+  original.name = newData.name;
+  original.thumbnailUrl = newData.thumbnailUrl;
+  original.previewUrl = newData.previewUrl;
+  original.prices = newData.prices;
+  original.quantity = newData.quantity;
+  original.description = newData.description;
+  original.isImgUploading = newData.isImgUploading;
 }

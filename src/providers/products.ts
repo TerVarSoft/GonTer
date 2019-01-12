@@ -1,4 +1,4 @@
-import { RequestOptions, URLSearchParams  } from '@angular/http';
+import { RequestOptions, URLSearchParams } from '@angular/http';
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 
@@ -15,21 +15,26 @@ export class Products {
 
   baseUrl: string;
 
-  endpoint: string = "products";
+  endpoint: string = 'products';
+
+  imageEndpoint: string = 'images';
 
   constructor(public api: TunariApi, public storage: TunariStorage) { }
 
-  get(query: string, page: number = 1) {
+  get(query: any, page: number = 1) {
     let params: URLSearchParams = new URLSearchParams();
-    params.set('tags', query); 
-    params.set('page', page.toString()); 
-    let requestOptions = new RequestOptions({search: params});
+    params.set('tags', query.tags);
+    params.set('categoryId', query.categoryId);
+    params.set('typeId', query.typeId);
+    params.set('page', page.toString());
+    params.set('limit', "20");
+    let requestOptions = new RequestOptions({ search: params });
 
     return this.api.get(this.endpoint, requestOptions);
   }
 
   save(product) {
-    if(product._id) {
+    if (product.id) {
       return this.put(product);
     } else {
       return this.post(product);
@@ -40,29 +45,35 @@ export class Products {
     return this.api.post(this.endpoint, product);
   }
 
-  put(product) {    
-    return this.api.put(`${this.endpoint}/${product._id}`, product);
+  put(product) {
+    return this.api.put(`${this.endpoint}/${product.id}`, product);
   }
-  
+
+  updateProductImg(productId, imageData) {
+    console.log('Uploading Image...');
+    return this.api.postImage(`${this.imageEndpoint}/${productId}`, imageData);
+  }
+
   remove(product) {
-    return this.api.remove(`${this.endpoint}/${product._id}`);
+    return this.api.remove(`${this.endpoint}/${product.id}`);
   }
 
   getFavorites(productCategory) {
     return this.storage.getProductFavorites().then(favoritesObject => {
-      return favoritesObject ? 
+      return favoritesObject ?
         _.filter(favoritesObject.items, favorite => favorite.category === productCategory) :
         null;
     });
   }
-  
+
   loadFavoritesFromServer(productCategory) {
     let params: URLSearchParams = new URLSearchParams();
-    params.set('isFavorite', "true"); 
-    let requestOptions = new RequestOptions({search: params});
+    params.set('isFavorite', "true");
+    params.set('limit', "10");
+    let requestOptions = new RequestOptions({ search: params });
 
     return this.api.get(this.endpoint, requestOptions)
-      .map(productsObject => {        
+      .map(productsObject => {
         this.storage.setProductFavorites(productsObject);
         productsObject.items = _.filter(productsObject.items, favorite => favorite.category === productCategory);
         return productsObject;
@@ -71,8 +82,8 @@ export class Products {
 
   getLowQuantity() {
     let params: URLSearchParams = new URLSearchParams();
-    params.set('isLowQuantity', "true"); 
-    let requestOptions = new RequestOptions({search: params});
+    params.set('isLowQuantity', "true");
+    let requestOptions = new RequestOptions({ search: params });
 
     return this.api.get(this.endpoint, requestOptions);
   }

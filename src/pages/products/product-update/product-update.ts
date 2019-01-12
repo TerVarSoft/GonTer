@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import { Component } from '@angular/core';
 import { Camera } from 'ionic-native';
 import { NavParams, AlertController, NavController } from 'ionic-angular';
@@ -6,9 +7,9 @@ import { Products } from '../../../providers/products';
 import { ProductsUtil } from './../products-util';
 import { TunariNotifier } from '../../../providers/tunari-notifier';
 import { SettingsCache } from '../../../providers/settings-cache';
+import { TunariMessages } from '../../../providers/tunari-messages';
 
-import { Product } from '../../../models/product';
-import { ProductPrice } from '../../../models/product-price';
+import { Product, updateProductPatch } from '../../../models/product';
 
 @Component({
   selector: 'product-update',
@@ -17,21 +18,26 @@ import { ProductPrice } from '../../../models/product-price';
 })
 export class ProductUpdatePage {
 
-  private INVITATION_TYPE: string = 'Invitaciones';
-
   segment = 'general';
 
- loadedImageData: string;
+  imagePreview: string;
+
+  tmpImageData: string;
 
   isInvitation: boolean;
 
   product: Product;
 
-  categories: any[];
+  originalProduct: Product;
 
-  invitationTypes: string[];
+  productCategories: any[];
 
   priceTypes: any[]
+
+  productTypes: any[];
+
+  productPrices: any[];
+
 
   constructor(public navParams: NavParams,
     private alertCtrl: AlertController,
@@ -39,50 +45,57 @@ export class ProductUpdatePage {
     public util: ProductsUtil,
     public productsProvider: Products,
     public notifier: TunariNotifier,
-    private settingsProvider: SettingsCache) {
-    this.product = this.navParams.data.product;
+    private settingsProvider: SettingsCache,
+    private messages: TunariMessages) {
 
-    this.categories = settingsProvider.getProductCategories();
-    this.invitationTypes = settingsProvider.getInvitationTypes();
-    this.product.category = this.product.category || this.categories[0].name;
+    this.originalProduct = this.navParams.data.product;
+    this.product = cloneDeep(this.navParams.data.product);
 
-    this.product.properties = this.product.properties || {};
-    this.product.tags = this.product.tags || [];
-    this.product.locations = this.product.locations || [];
-
-    this.initCategory();
+    this.initProperties();
   }
 
-  public initCategory() {
-    this.isInvitation = this.product.category == this.INVITATION_TYPE;
-    this.initProperties();
+  public updateCategory() {
+    this.productTypes = this.settingsProvider.getProductTypes(this.product.categoryId);
+    this.product.typeId = '0';
+    this.initProductPrices();
+  }
+
+  public updateType() {
     this.initProductPrices();
   }
 
   public initProperties() {
-    this.product.properties = this.isInvitation ?
-      (this.product.properties || { type: "", size: "", genre: "" }) :
-      {};
+    this.productCategories = this.settingsProvider.getProductCategories();
+    this.product.categoryId = this.product.categoryId ||
+      this.navParams.data.selectedProductCategoryId ||
+      '0';
+    this.productTypes = this.settingsProvider.getProductTypes(this.product.categoryId);
 
-    this.product.properties.type = this.isInvitation ?
-      (this.product.properties.type || this.invitationTypes[0]) :
-      null;
+    this.product.typeId = this.product.typeId ||
+      this.navParams.data.selectedProductTypeId ||
+      '0';
+
+    this.product.tags = this.product.tags || [];
+    this.product.locations = this.product.locations || [];
+
+    this.initProductPrices();
   }
 
-  public initProductPrices() {
-    // Init product prices
-    this.priceTypes = this.util.getPriceTypes(this.product.category);
-    this.product.prices = this.product.prices || [];
-    this.product.prices = this.priceTypes.map(priceType => {
-      let productPrice: ProductPrice = {
-        type: priceType.id,
-        value: this.product.prices[priceType.id] ?
-          this.product.prices[priceType.id].value :
-          undefined
-      };
+  initProductPrices() {
+    this.productPrices = this.settingsProvider.getProductPrices(
+      this.product.categoryId || '0',
+      this.product.typeId || '0');
 
-      return productPrice;
-    })
+    const newPrices = this.productPrices.map(priceType => {
+      const productPrice = this.product.prices.find(price => price.priceId === priceType.id);
+      return {
+        priceId: priceType.id,
+        name: priceType.name,
+        value: productPrice ? productPrice.value : 0
+      }
+    });
+
+    this.product.prices = newPrices;
   }
 
   addTag() {
@@ -114,10 +127,9 @@ export class ProductUpdatePage {
     Camera.getPicture({
       destinationType: Camera.DestinationType.DATA_URL,
       sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
-      targetWidth: 1000,
-      targetHeight: 1000
     }).then((imageData) => {
-      this.loadedImageData = "data:image/jpeg;base64," + imageData;
+      this.imagePreview = "data:image/jpeg;base64," + imageData;
+      this.tmpImageData = imageData;
     }, (err) => {
       console.log(err);
     });
@@ -126,22 +138,34 @@ export class ProductUpdatePage {
   takePicture() {
     Camera.getPicture({
       destinationType: Camera.DestinationType.DATA_URL,
-      targetWidth: 1000,
-      targetHeight: 1000
     }).then((imageData) => {
-      this.loadedImageData = "data:image/jpeg;base64," + imageData;
+      this.imagePreview = "data:image/jpeg;base64," + imageData;
+      this.tmpImageData = imageData;
     }, (err) => {
       console.log(err);
     });
   }
 
   save() {
-    this.product.imageData = this.loadedImageData;
     let createProductLoader = this.notifier.createLoader(`Guardando producto ${this.product.name}`);
-    this.productsProvider.save(this.product).subscribe(() => {
+    this.product.isImgUploading = true;
+    this.productsProvider.save(this.product).subscribe((updatedProduct: any) => {
+      updateProductPatch(this.originalProduct, updatedProduct);
       this.updateFavoritesInBackground();
+
+      this.productsProvider.updateProductImg(updatedProduct.id, this.tmpImageData)
+        .subscribe((updatedProduct: any) => {
+          console.log('updating after upload')
+          updateProductPatch(this.originalProduct, updatedProduct);
+          this.updateFavoritesInBackground();
+        });
+
+      this.navCtrl.pop(updatedProduct);
+      createProductLoader.dismiss();
+    }, error => {
       this.navCtrl.pop();
       createProductLoader.dismiss();
+      this.notifier.createToast(this.messages.errorWhenSavingProduct);
     });
   }
 

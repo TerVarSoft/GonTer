@@ -18,4 +18,8 @@ export class TunariMessages {
   invalidUser: string = `Tus usuario o tu passwords son incorrectos!`;
 
   notAdminUser: string = `Tu usuario no es administrador!`;
+
+  errorWhenSavingProduct: string = `Hubo un error salvando el producto!`;
+
+  noPriceConfigured: string = `No hay un precio configurado para este producto, actualizalo!`;
 }

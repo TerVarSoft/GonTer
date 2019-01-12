@@ -9,7 +9,8 @@
   </ion-navbar>
 
   <ion-toolbar color="primary">
-    <ion-searchbar animated=true	 #searchInput placeholder="Busca un producto en GrafTunari !" [formControl]="searchQuery" (ionClear)="onSearchClear()">
+    <ion-searchbar animated=true #searchInput placeholder="Busca un producto en el sistema !" [formControl]="searchQuery"
+      (ionClear)="onSearchClear()">
     </ion-searchbar>
   </ion-toolbar>
 </ion-header>
@@ -23,8 +24,8 @@
         </ion-thumbnail>
         <h2 class="text-color">{{product.name}}</h2>
         <h3 class="text-color">{{product.description || product.properties?.type}}</h3>
-        <p *ngIf="product.prices[selectedPrice]?.value">
-          Precio {{selectedPriceText}}: {{product.prices[selectedPrice].value}} Bs.
+        <p>
+          {{getSelectedProductPrice(product)}}
         </p>
 
         <ion-icon item-end (click)="openProductOptions($event, product)" color="primary" name="more"></ion-icon>
@@ -49,18 +50,10 @@
     </ion-item-sliding>
   </ion-list>
 
-  <ion-fab bottom right #fab>
+  <ion-fab bottom right #fab (click)="createProduct(fab)">
     <button ion-fab color="secondary">
-      <ion-icon name="filing"></ion-icon>
+      <ion-icon name="add"></ion-icon>
     </button>
-    <ion-fab-list side="top">
-      <button ion-fab color="secondary-200" (click)="selectPriceToShow(fab)">
-        <ion-icon name="pricetags"></ion-icon>
-      </button>
-      <button ion-fab color="secondary-200" (click)="createProduct(fab)">
-        <ion-icon name="add"></ion-icon>
-      </button>
-    </ion-fab-list>
   </ion-fab>
 
   <ion-infinite-scroll (ionInfinite)="pullNextProductsPage($event)">
@@ -68,3 +61,18 @@
     </ion-infinite-scroll-content>
   </ion-infinite-scroll>
 </ion-content>
+
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-chip *ngIf="productCategories && productCategories.length > 2" (click)="changeCategory($event)">
+      <ion-label>{{selectedCategory.name}}</ion-label>
+    </ion-chip>
+    <ion-chip *ngIf="productTypes && productTypes.length > 2" (click)="changeType($event)">
+      <ion-label>{{selectedType.name}}</ion-label>
+    </ion-chip>
+    <ion-chip *ngIf="productPrices && productPrices.length > 0" (click)="changePrice($event)">
+      <ion-label>{{selectedPrice.name}}</ion-label>
+    </ion-chip>
+  </ion-toolbar>
+</ion-footer>

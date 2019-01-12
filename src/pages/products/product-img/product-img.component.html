@@ -1,3 +1,4 @@
-<img (click)="openImage($event, product)"
-  [src]="(product.imageData || url) | safeUrl"
-  style="object-fit: contain;"/>
+<loading-img *ngIf="product.isImgUploading">
+</loading-img>
+<thumbnail-img *ngIf="!product.isImgUploading" (click)="openImage($event)" [thumbnailUrl]="product.thumbnailUrl">
+</thumbnail-img>

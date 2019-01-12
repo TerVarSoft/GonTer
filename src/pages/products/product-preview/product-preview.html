@@ -4,5 +4,5 @@
     </ion-navbar>
 </ion-header>
 <ion-content (click)="closePreview()" style="background-color:#111;text-align:center;margin-top:30px">
-    <img [src]="(product.imageData || url) | safeUrl" style="width: 90%;height:70%;object-fit:contain;"/>
+    <img [src]="url | safeUrl" style="width: 90%;height:70%;object-fit:contain;"/>
 </ion-content>

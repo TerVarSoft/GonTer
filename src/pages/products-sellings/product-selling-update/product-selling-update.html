@@ -74,7 +74,7 @@
         <ion-label>Ganancia</ion-label>
         <ion-input [(ngModel)]="selling.revenue" type="number"></ion-input>
     </ion-item>
-    <ion-item *ngIf="selling._id">
+    <ion-item *ngIf="selling.id">
         <button item-end ion-button color="danger" (click)="remove()">Borrar Venta</button>
     </ion-item>
 </ion-content>
